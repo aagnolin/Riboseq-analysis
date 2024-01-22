@@ -1,3 +1,6 @@
+#Data analysis Riboseq experiments
+#github aagnolin
+
 library(tidyverse)
 library(readxl)
 
@@ -240,7 +243,7 @@ r_squared_gene_coverage <- summary(linear_model_gene_coverage)$r.squared
 coeff_gene_coverage <-coefficients(linear_model_gene_coverage)           
 intercept_gene_coverage <-coeff_gene_coverage[1] 
 slope_gene_coverage <- coeff_gene_coverage[2] 
- 
+
 #Plot gene coverage of different samples
 ggplot(data = Merged_gene_coverage,
        mapping = aes(
@@ -257,9 +260,9 @@ ggplot(data = Merged_gene_coverage,
   scale_x_continuous(trans = 'log10') +
   scale_y_continuous(trans = 'log10') + 
   annotate("text", x = min(Merged_gene_coverage$gene_coverage1),
-             y = max(Merged_gene_coverage$gene_coverage2), 
-             label = paste("R-squared =", round(r_squared_gene_coverage, 3)), 
-             hjust = 0, vjust = 1, size = 4) +
+           y = max(Merged_gene_coverage$gene_coverage2), 
+           label = paste("R-squared =", round(r_squared_gene_coverage, 3)), 
+           hjust = 0, vjust = 1, size = 4) +
   labs(colour = "Sample") +
   theme(legend.background = element_rect(colour = 'black', fill = 'white', linetype='solid'),
         legend.key.height= unit(0.05, 'cm'),
@@ -317,7 +320,7 @@ filtered_data <- all_data %>%
 
 # Plot the data
 Plot <- ggplot(data = filtered_data,
-       mapping = aes(x = position)) +
+               mapping = aes(x = position)) +
   geom_col(aes(y = coalesce(Norm_count_1, 0)), fill = 'navy', size = 1, alpha = 0.5) +
   geom_col(aes(y = coalesce(Norm_count_2, 0)), fill = 'orange', size = 1, alpha = 0.5) +
   theme_bw() +
@@ -609,7 +612,7 @@ Merged_same_position_cutoff <- filter(Merged_same_position, Norm_count.x >= cuto
 #linear regression
 
 ggplot(data = Merged_same_position_cutoff,
-      mapping = aes(x = Norm_count.x,
+       mapping = aes(x = Norm_count.x,
                      y = Norm_count.y)) +
   geom_point() +
   scale_x_continuous(trans = "log10") +
@@ -670,8 +673,8 @@ Merged_same_position_codon <- Merged_same_position_codon %>% select(-genome.y,
                                                                     -in_orf_90.y,
                                                                     -count.y,
                                                                     -sequence.y
-                                                                    )
-  
+)
+
 
 ###Sum the number of reads in each codon
 Merged_codon_summed_reads <- Merged_same_position_codon %>% 
@@ -739,14 +742,14 @@ ggplot(data = as.data.frame(logData_codon),
 
 Merged_same_position_codon_floor <- merge(Normalized_riboseq_1, Normalized_riboseq_2, 'position') %>%  mutate(codon_position = floor(offset.x/3))
 Merged_same_position_codon_floor <- Merged_same_position_codon_floor %>% select(-genome.y,
-                                                                    -strand.y,
-                                                                    -gene.y,
-                                                                    #-locus_tag.y,
-                                                                    -gene_length.y,
-                                                                    -offset.y,
-                                                                    -in_orf_90.y,
-                                                                    -count.y,
-                                                                    -sequence.y
+                                                                                -strand.y,
+                                                                                -gene.y,
+                                                                                #-locus_tag.y,
+                                                                                -gene_length.y,
+                                                                                -offset.y,
+                                                                                -in_orf_90.y,
+                                                                                -count.y,
+                                                                                -sequence.y
 )
 ###Sum the number of reads in each codon
 Merged_codon_summed_reads_floor <- Merged_same_position_codon_floor %>% 
@@ -857,7 +860,7 @@ ggplot(data = filter(Sequence_length_distributions_all_samples, Sample == "Mupir
 
 ggplot(data = filter(RNA_fractions_all_samples, Sample == "2X PEG", `Date of Experiment` == "Jan-23"), 
        mapping = aes(x = "", y = Percentage, fill = Fraction)
-       ) + 
+) + 
   geom_bar(width = 1, stat = "identity", col = 'black', linewidth = 0.5) +
   geom_text(aes(label = paste(Percentage, "%")),
             position = position_stack(vjust = 0.5),
@@ -1001,11 +1004,11 @@ for (i in 1:nrow(gene_info_df)) {
   # Calculate the converted positions and store as a list
   converted_positions <- start_pos + isoleucine_positions - 1
   converted_positions_list[[i]] <- converted_positions
-
-# Extract isoleucine codons and store as a list
-sequence <- gene_info_df$Sequence[i]
-codons <- lapply(isoleucine_positions, function(pos) substr(sequence, pos, pos + 2))
-gene_info_df$IsoleucineCodons[i] <- list(codons)
+  
+  # Extract isoleucine codons and store as a list
+  sequence <- gene_info_df$Sequence[i]
+  codons <- lapply(isoleucine_positions, function(pos) substr(sequence, pos, pos + 2))
+  gene_info_df$IsoleucineCodons[i] <- list(codons)
 }
 
 #select gene for plotting
@@ -1069,183 +1072,183 @@ Plot +
   theme(legend.position = c(0.05, 0.95),  # Adjust these values to position the legend
         legend.justification = c(0, 1),
         legend.box.just = "left")
-  
+
 #=====================================
-  
-  #tRNA STUFF
-  
-  tRNA_standard <- read_csv("C:/Users/aagnoli/OneDrive - UvA/RNA sequencing data/Test for tRNA fractions Histag ST and WASH June23/Filtered_tRNA_Standard_35_full.csv")
-  tRNA_wash <- read_csv("C:/Users/aagnoli/OneDrive - UvA/RNA sequencing data/Test for tRNA fractions Histag ST and WASH June23/Filtered_tRNA_Wash_35_full.csv")
-  
-  sum(tRNA_standard$count)
-  sum(tRNA_wash$count)
-  
-  Norm_tRNA_standard <- mutate(tRNA_standard, Norm_count = tRNA_standard$count*(sum(tRNA_standard$count)/sum(tRNA_standard$count)))
-  Norm_tRNA_wash <- mutate(tRNA_wash, Norm_count = tRNA_wash$count*(sum(tRNA_standard$count)/sum(tRNA_wash$count)))
-  
-  Norm_tRNA_standard <- filter(Norm_tRNA_standard, grepl('BSU_tRNA', Norm_tRNA_standard$locus_tag))
-  sum_per_gene_standard <- group_by(Norm_tRNA_standard, gene) %>% summarize(tot_count = sum(Norm_count))
-  
-  Norm_tRNA_wash <- filter(Norm_tRNA_wash, grepl('BSU_tRNA', Norm_tRNA_wash$locus_tag))
-  sum_per_gene_wash <- group_by(Norm_tRNA_wash, gene) %>% summarize(tot_count = sum(Norm_count))
-  
-  ggplot() +
-    geom_col(data = sum_per_gene_standard,
-             mapping = aes(
-               x = gene,
-               y = tot_count)) +
-    geom_col(data = sum_per_gene_wash,
-             mapping = aes(
-               x = gene,
-               y = tot_count), fill = 'yellow', alpha = 0.5, col = 'black') +
-    theme(axis.text.x = element_text(vjust = 0.6, angle = 90))
-  
+
+#tRNA STUFF
+
+tRNA_standard <- read_csv("C:/Users/aagnoli/OneDrive - UvA/RNA sequencing data/Test for tRNA fractions Histag ST and WASH June23/Filtered_tRNA_Standard_35_full.csv")
+tRNA_wash <- read_csv("C:/Users/aagnoli/OneDrive - UvA/RNA sequencing data/Test for tRNA fractions Histag ST and WASH June23/Filtered_tRNA_Wash_35_full.csv")
+
+sum(tRNA_standard$count)
+sum(tRNA_wash$count)
+
+Norm_tRNA_standard <- mutate(tRNA_standard, Norm_count = tRNA_standard$count*(sum(tRNA_standard$count)/sum(tRNA_standard$count)))
+Norm_tRNA_wash <- mutate(tRNA_wash, Norm_count = tRNA_wash$count*(sum(tRNA_standard$count)/sum(tRNA_wash$count)))
+
+Norm_tRNA_standard <- filter(Norm_tRNA_standard, grepl('BSU_tRNA', Norm_tRNA_standard$locus_tag))
+sum_per_gene_standard <- group_by(Norm_tRNA_standard, gene) %>% summarize(tot_count = sum(Norm_count))
+
+Norm_tRNA_wash <- filter(Norm_tRNA_wash, grepl('BSU_tRNA', Norm_tRNA_wash$locus_tag))
+sum_per_gene_wash <- group_by(Norm_tRNA_wash, gene) %>% summarize(tot_count = sum(Norm_count))
+
+ggplot() +
+  geom_col(data = sum_per_gene_standard,
+           mapping = aes(
+             x = gene,
+             y = tot_count)) +
+  geom_col(data = sum_per_gene_wash,
+           mapping = aes(
+             x = gene,
+             y = tot_count), fill = 'yellow', alpha = 0.5, col = 'black') +
+  theme(axis.text.x = element_text(vjust = 0.6, angle = 90))
+
 #==========================================================================
-  
-  ##FOLD-CHANGE ON GENE COVERAGES
-  
-  #Here I use 4 datasets; 2 
-  
-  riboseq_1 <- filtered_Histag_Standard_35_full_June_2023
-  riboseq_2 <- filtered_2X_Spin_35_full_June_2023
-  riboseq_3 <- filtered_Histag2_July_35_full_July_2023
-  riboseq_4 <- filtered_2X_Spin_35_full_January_2023
-  
-  #Normalize datasets (only considering ORFs)
-  
-  riboseq_1_ORFs <- riboseq_1 %>% filter(in_orf_90 == TRUE)
-  sum(riboseq_1_ORFs$count)
-  riboseq_2_ORFs <- riboseq_2 %>% filter(in_orf_90 == TRUE)
-  sum(riboseq_2_ORFs$count)
-  riboseq_3_ORFs <- riboseq_3 %>% filter(in_orf_90 == TRUE)
-  sum(riboseq_3_ORFs$count)
-  riboseq_4_ORFs <- riboseq_4 %>% filter(in_orf_90 == TRUE)
-  sum(riboseq_4_ORFs$count)
-  
-  Normalized_riboseq_1 <- mutate(riboseq_1_ORFs, Norm_count = riboseq_1_ORFs$count*(sum(riboseq_1_ORFs$count)/sum(riboseq_1_ORFs$count)))
-  Normalized_riboseq_2 <- mutate(riboseq_2_ORFs, Norm_count = riboseq_2_ORFs$count*(sum(riboseq_1_ORFs$count)/sum(riboseq_2_ORFs$count)))
-  Normalized_riboseq_3 <- mutate(riboseq_3_ORFs, Norm_count = riboseq_3_ORFs$count*(sum(riboseq_1_ORFs$count)/sum(riboseq_3_ORFs$count)))
-  Normalized_riboseq_4 <- mutate(riboseq_4_ORFs, Norm_count = riboseq_4_ORFs$count*(sum(riboseq_1_ORFs$count)/sum(riboseq_4_ORFs$count)))
-  
-  #Calculate Gene coverage
-  
-  Gene_coverage_Normalized_riboseq_1 <- Normalized_riboseq_1 %>% group_by(locus_tag, gene_length, gene) %>% summarise(Norm_tot_counts = sum(Norm_count))
-  Gene_coverage_Normalized_riboseq_1 <- Gene_coverage_Normalized_riboseq_1 %>% mutate(gene_coverage = Norm_tot_counts/gene_length)
-  Gene_coverage_Normalized_riboseq_2 <- Normalized_riboseq_2 %>% group_by(locus_tag, gene_length, gene) %>% summarise(Norm_tot_counts = sum(Norm_count))
-  Gene_coverage_Normalized_riboseq_2 <- Gene_coverage_Normalized_riboseq_2 %>% mutate(gene_coverage = Norm_tot_counts/gene_length)
-  Gene_coverage_Normalized_riboseq_3 <- Normalized_riboseq_3 %>% group_by(locus_tag, gene_length, gene) %>% summarise(Norm_tot_counts = sum(Norm_count))
-  Gene_coverage_Normalized_riboseq_3 <- Gene_coverage_Normalized_riboseq_3 %>% mutate(gene_coverage = Norm_tot_counts/gene_length)
-  Gene_coverage_Normalized_riboseq_4 <- Normalized_riboseq_4 %>% group_by(locus_tag, gene_length, gene) %>% summarise(Norm_tot_counts = sum(Norm_count))
-  Gene_coverage_Normalized_riboseq_4 <- Gene_coverage_Normalized_riboseq_4 %>% mutate(gene_coverage = Norm_tot_counts/gene_length)
-  
-  Merged_riboseq1_and_riboseq2 <- merge(Gene_coverage_Normalized_riboseq_1, Gene_coverage_Normalized_riboseq_2, by = 'locus_tag', all = T, suffixes = c('1', '2'))
-  Merged_riboseq3_and_riboseq4 <- merge(Gene_coverage_Normalized_riboseq_3, Gene_coverage_Normalized_riboseq_4, by = 'locus_tag', all = T, suffixes = c('3','4'))
-  Merged_riboseq <- merge(Merged_riboseq1_and_riboseq2, Merged_riboseq3_and_riboseq4, by = 'locus_tag')
-  
-  Avg_gene_coverage <- Merged_riboseq %>% rowwise() %>% mutate(average_gene_coverage1_2 = mean(c(gene_coverage1, gene_coverage2), na.rm = TRUE), average_gene_coverage3_4 = mean(c(gene_coverage3, gene_coverage4), na.rm = TRUE))
-  
-  Merged_Avg_gene_coverage <- Avg_gene_coverage %>%
-    rowwise() %>%
-    mutate(FC = ifelse(
-      is.na(average_gene_coverage1_2) | is.na(average_gene_coverage3_4),
-      NA,
-      log2(average_gene_coverage1_2) - log2(average_gene_coverage3_4)
-    ))
-  
-  Merged_Avg_gene_coverage$FC <- ifelse(
-    is.na(Avg_gene_coverage$average_gene_coverage1_2) | is.na(Avg_gene_coverage$average_gene_coverage3_4),
-    NA, # Set the fold change to NA if either of the values is NA
-    log2(Avg_gene_coverage$average_gene_coverage1_2) - log2(Avg_gene_coverage$average_gene_coverage3_4)
-  )
-  
-  Significant_genes <- filter(Merged_Avg_gene_coverage, FC < -1.5 | FC > 1.5)
-  
-  ###spin depl vs Histag standard
-  Extra_Normalized_2X_Spin_depl <- mutate(X2X_Spin_depl_ORFs, Norm_count = X2X_Spin_depl_ORFs$count*(sum(X2X_Spin_depl_ORFs$count)/sum(X2X_Spin_depl_ORFs$count)))
-  Extra_Normalized_Histag_Standard <- mutate(Histag_Standard_ORFs, Norm_count = Histag_Standard_ORFs$count*(sum(X2X_Spin_depl_ORFs$count)/sum(Histag_Standard$count)))
-  
-  Extra_Gene_coverage_2X_Spin_depl <- Extra_Normalized_2X_Spin_depl %>% group_by(gene, gene_length) %>% summarise(Norm_tot_counts = sum(Norm_count))
-  Extra_Gene_coverage_2X_Spin_depl <- Extra_Gene_coverage_2X_Spin_depl %>% mutate(gene_coverage = Norm_tot_counts/gene_length)
-  Extra_Gene_coverage_Histag_Standard <- Extra_Normalized_Histag_Standard %>% group_by(gene, gene_length) %>% summarise(Norm_tot_counts = sum(Norm_count))
-  Extra_Gene_coverage_Histag_Standard <- Extra_Gene_coverage_Histag_Standard %>% mutate(gene_coverage = Norm_tot_counts/gene_length)
-  
-  Merged_gene_coverage_2x_Spin_depl_and_Histag_Standard_lol <- merge(Extra_Gene_coverage_2X_Spin_depl, Extra_Gene_coverage_Histag_Standard, by = 'gene', suffixes = c("_Spin_depl", "_Histag"))
-  
-  Merged_gene_coverage_2x_Spin_depl_and_Histag_Standard_lol$fold_change <- log2(Merged_gene_coverage_2x_Spin_and_Histag_Standard_lol$gene_coverage_Spin / Merged_gene_coverage_2x_Spin_and_Histag_Standard_lol$gene_coverage_Histag)
-  
-  ###spin vs Histag standard
-  Extra_Normalized_2X_Spin <- mutate(X2X_Spin_ORFs, Norm_count = X2X_Spin_ORFs$count*(sum(Histag_Standard_ORFs$count)/sum(X2X_Spin_depl_ORFs$count)))
-  Extra_Normalized_Histag_Standard <- mutate(Histag_Standard_ORFs, Norm_count = Histag_Standard_ORFs$count*(sum(Histag_Standard_ORFs$count)/sum(Histag_Standard$count)))
-  
-  Extra_Gene_coverage_2X_Spin <- Extra_Normalized_2X_Spin %>% group_by(gene, gene_length) %>% summarise(Norm_tot_counts = sum(Norm_count))
-  Extra_Gene_coverage_2X_Spin <- Extra_Gene_coverage_2X_Spin %>% mutate(gene_coverage = Norm_tot_counts/gene_length)
-  Extra_Gene_coverage_Histag_Standard <- Extra_Normalized_Histag_Standard %>% group_by(gene, gene_length) %>% summarise(Norm_tot_counts = sum(Norm_count))
-  Extra_Gene_coverage_Histag_Standard <- Extra_Gene_coverage_Histag_Standard %>% mutate(gene_coverage = Norm_tot_counts/gene_length)
-  
-  Merged_gene_coverage_2x_Spin_and_Histag_Standard <- merge(Extra_Gene_coverage_2X_Spin, Extra_Gene_coverage_Histag_Standard, by = 'gene', suffixes = c("_Spin", "_Histag"))
-  
-  Merged_gene_coverage_2x_Spin_and_Histag_Standard$fold_change <- log2(Merged_gene_coverage_2x_Spin_and_Histag_Standard$gene_coverage_Spin / Merged_gene_coverage_2x_Spin_and_Histag_Standard$gene_coverage_Histag)
-  
-  #====================================================================
-  
+
+##FOLD-CHANGE ON GENE COVERAGES
+
+#Here I use 4 datasets; 2 
+
+riboseq_1 <- filtered_Histag_Standard_35_full_June_2023
+riboseq_2 <- filtered_2X_Spin_35_full_June_2023
+riboseq_3 <- filtered_Histag2_July_35_full_July_2023
+riboseq_4 <- filtered_2X_Spin_35_full_January_2023
+
+#Normalize datasets (only considering ORFs)
+
+riboseq_1_ORFs <- riboseq_1 %>% filter(in_orf_90 == TRUE)
+sum(riboseq_1_ORFs$count)
+riboseq_2_ORFs <- riboseq_2 %>% filter(in_orf_90 == TRUE)
+sum(riboseq_2_ORFs$count)
+riboseq_3_ORFs <- riboseq_3 %>% filter(in_orf_90 == TRUE)
+sum(riboseq_3_ORFs$count)
+riboseq_4_ORFs <- riboseq_4 %>% filter(in_orf_90 == TRUE)
+sum(riboseq_4_ORFs$count)
+
+Normalized_riboseq_1 <- mutate(riboseq_1_ORFs, Norm_count = riboseq_1_ORFs$count*(sum(riboseq_1_ORFs$count)/sum(riboseq_1_ORFs$count)))
+Normalized_riboseq_2 <- mutate(riboseq_2_ORFs, Norm_count = riboseq_2_ORFs$count*(sum(riboseq_1_ORFs$count)/sum(riboseq_2_ORFs$count)))
+Normalized_riboseq_3 <- mutate(riboseq_3_ORFs, Norm_count = riboseq_3_ORFs$count*(sum(riboseq_1_ORFs$count)/sum(riboseq_3_ORFs$count)))
+Normalized_riboseq_4 <- mutate(riboseq_4_ORFs, Norm_count = riboseq_4_ORFs$count*(sum(riboseq_1_ORFs$count)/sum(riboseq_4_ORFs$count)))
+
+#Calculate Gene coverage
+
+Gene_coverage_Normalized_riboseq_1 <- Normalized_riboseq_1 %>% group_by(locus_tag, gene_length, gene) %>% summarise(Norm_tot_counts = sum(Norm_count))
+Gene_coverage_Normalized_riboseq_1 <- Gene_coverage_Normalized_riboseq_1 %>% mutate(gene_coverage = Norm_tot_counts/gene_length)
+Gene_coverage_Normalized_riboseq_2 <- Normalized_riboseq_2 %>% group_by(locus_tag, gene_length, gene) %>% summarise(Norm_tot_counts = sum(Norm_count))
+Gene_coverage_Normalized_riboseq_2 <- Gene_coverage_Normalized_riboseq_2 %>% mutate(gene_coverage = Norm_tot_counts/gene_length)
+Gene_coverage_Normalized_riboseq_3 <- Normalized_riboseq_3 %>% group_by(locus_tag, gene_length, gene) %>% summarise(Norm_tot_counts = sum(Norm_count))
+Gene_coverage_Normalized_riboseq_3 <- Gene_coverage_Normalized_riboseq_3 %>% mutate(gene_coverage = Norm_tot_counts/gene_length)
+Gene_coverage_Normalized_riboseq_4 <- Normalized_riboseq_4 %>% group_by(locus_tag, gene_length, gene) %>% summarise(Norm_tot_counts = sum(Norm_count))
+Gene_coverage_Normalized_riboseq_4 <- Gene_coverage_Normalized_riboseq_4 %>% mutate(gene_coverage = Norm_tot_counts/gene_length)
+
+Merged_riboseq1_and_riboseq2 <- merge(Gene_coverage_Normalized_riboseq_1, Gene_coverage_Normalized_riboseq_2, by = 'locus_tag', all = T, suffixes = c('1', '2'))
+Merged_riboseq3_and_riboseq4 <- merge(Gene_coverage_Normalized_riboseq_3, Gene_coverage_Normalized_riboseq_4, by = 'locus_tag', all = T, suffixes = c('3','4'))
+Merged_riboseq <- merge(Merged_riboseq1_and_riboseq2, Merged_riboseq3_and_riboseq4, by = 'locus_tag')
+
+Avg_gene_coverage <- Merged_riboseq %>% rowwise() %>% mutate(average_gene_coverage1_2 = mean(c(gene_coverage1, gene_coverage2), na.rm = TRUE), average_gene_coverage3_4 = mean(c(gene_coverage3, gene_coverage4), na.rm = TRUE))
+
+Merged_Avg_gene_coverage <- Avg_gene_coverage %>%
+  rowwise() %>%
+  mutate(FC = ifelse(
+    is.na(average_gene_coverage1_2) | is.na(average_gene_coverage3_4),
+    NA,
+    log2(average_gene_coverage1_2) - log2(average_gene_coverage3_4)
+  ))
+
+Merged_Avg_gene_coverage$FC <- ifelse(
+  is.na(Avg_gene_coverage$average_gene_coverage1_2) | is.na(Avg_gene_coverage$average_gene_coverage3_4),
+  NA, # Set the fold change to NA if either of the values is NA
+  log2(Avg_gene_coverage$average_gene_coverage1_2) - log2(Avg_gene_coverage$average_gene_coverage3_4)
+)
+
+Significant_genes <- filter(Merged_Avg_gene_coverage, FC < -1.5 | FC > 1.5)
+
+###spin depl vs Histag standard
+Extra_Normalized_2X_Spin_depl <- mutate(X2X_Spin_depl_ORFs, Norm_count = X2X_Spin_depl_ORFs$count*(sum(X2X_Spin_depl_ORFs$count)/sum(X2X_Spin_depl_ORFs$count)))
+Extra_Normalized_Histag_Standard <- mutate(Histag_Standard_ORFs, Norm_count = Histag_Standard_ORFs$count*(sum(X2X_Spin_depl_ORFs$count)/sum(Histag_Standard$count)))
+
+Extra_Gene_coverage_2X_Spin_depl <- Extra_Normalized_2X_Spin_depl %>% group_by(gene, gene_length) %>% summarise(Norm_tot_counts = sum(Norm_count))
+Extra_Gene_coverage_2X_Spin_depl <- Extra_Gene_coverage_2X_Spin_depl %>% mutate(gene_coverage = Norm_tot_counts/gene_length)
+Extra_Gene_coverage_Histag_Standard <- Extra_Normalized_Histag_Standard %>% group_by(gene, gene_length) %>% summarise(Norm_tot_counts = sum(Norm_count))
+Extra_Gene_coverage_Histag_Standard <- Extra_Gene_coverage_Histag_Standard %>% mutate(gene_coverage = Norm_tot_counts/gene_length)
+
+Merged_gene_coverage_2x_Spin_depl_and_Histag_Standard_lol <- merge(Extra_Gene_coverage_2X_Spin_depl, Extra_Gene_coverage_Histag_Standard, by = 'gene', suffixes = c("_Spin_depl", "_Histag"))
+
+Merged_gene_coverage_2x_Spin_depl_and_Histag_Standard_lol$fold_change <- log2(Merged_gene_coverage_2x_Spin_and_Histag_Standard_lol$gene_coverage_Spin / Merged_gene_coverage_2x_Spin_and_Histag_Standard_lol$gene_coverage_Histag)
+
+###spin vs Histag standard
+Extra_Normalized_2X_Spin <- mutate(X2X_Spin_ORFs, Norm_count = X2X_Spin_ORFs$count*(sum(Histag_Standard_ORFs$count)/sum(X2X_Spin_depl_ORFs$count)))
+Extra_Normalized_Histag_Standard <- mutate(Histag_Standard_ORFs, Norm_count = Histag_Standard_ORFs$count*(sum(Histag_Standard_ORFs$count)/sum(Histag_Standard$count)))
+
+Extra_Gene_coverage_2X_Spin <- Extra_Normalized_2X_Spin %>% group_by(gene, gene_length) %>% summarise(Norm_tot_counts = sum(Norm_count))
+Extra_Gene_coverage_2X_Spin <- Extra_Gene_coverage_2X_Spin %>% mutate(gene_coverage = Norm_tot_counts/gene_length)
+Extra_Gene_coverage_Histag_Standard <- Extra_Normalized_Histag_Standard %>% group_by(gene, gene_length) %>% summarise(Norm_tot_counts = sum(Norm_count))
+Extra_Gene_coverage_Histag_Standard <- Extra_Gene_coverage_Histag_Standard %>% mutate(gene_coverage = Norm_tot_counts/gene_length)
+
+Merged_gene_coverage_2x_Spin_and_Histag_Standard <- merge(Extra_Gene_coverage_2X_Spin, Extra_Gene_coverage_Histag_Standard, by = 'gene', suffixes = c("_Spin", "_Histag"))
+
+Merged_gene_coverage_2x_Spin_and_Histag_Standard$fold_change <- log2(Merged_gene_coverage_2x_Spin_and_Histag_Standard$gene_coverage_Spin / Merged_gene_coverage_2x_Spin_and_Histag_Standard$gene_coverage_Histag)
+
+#====================================================================
+
 #PCA
+
+# Load and preprocess individual datasets
+dataset1 <- filtered_2X_Spin_35_full_January_2023  # Load your data from each experiment
+dataset2 <- filtered_2X_Spin_35_full_June_2023
+dataset3 <- filtered_2X_PEG_35_full_January_2023
+# ... other datasets if required
+
+# Combine datasets
+combined_data <- bind_rows(
   
-  # Load and preprocess individual datasets
-  dataset1 <- filtered_2X_Spin_35_full_January_2023  # Load your data from each experiment
-  dataset2 <- filtered_2X_Spin_35_full_June_2023
-  dataset3 <- filtered_2X_PEG_35_full_January_2023
-  # ... other datasets if required
+  data.frame(Method = "Standard", dataset1),
+  data.frame(Method = "Wash", dataset2),
+  data.frame(Method = "Lysate", dataset3)
   
-  # Combine datasets
-  combined_data <- bind_rows(
-    
-    data.frame(Method = "Standard", dataset1),
-    data.frame(Method = "Wash", dataset2),
-    data.frame(Method = "Lysate", dataset3)
-    
-    # ... bind other datasets if required
-  )
-  
-  # Perform PCA on combined data
-  pca_result <- prcomp(combined_data[, c(-1,-2,-4,-5,-6,-7,-8,-9,-11)], scale = TRUE)  # Exclude the columns with non-numerical values
-  
-  # Create a data frame for plotting
-  pca_df <- data.frame(Method = combined_data$Method, PCs = pca_result$x)
-  
-  # Rename the PCA columns to match the column names in pca_result
-  colnames(pca_df)[2:ncol(pca_df)] <- colnames(pca_result$x)
-  
-  # Create a PCA plot using ggplot2
-  ggplot(pca_df, aes(x = PC1, y = PC2, color = Method)) +
-    geom_point() +
-    labs(title = "PCA Plot by Method", x = "Principal Component 1", y = "Principal Component 2")
-  
-  
+  # ... bind other datasets if required
+)
+
+# Perform PCA on combined data
+pca_result <- prcomp(combined_data[, c(-1,-2,-4,-5,-6,-7,-8,-9,-11)], scale = TRUE)  # Exclude the columns with non-numerical values
+
+# Create a data frame for plotting
+pca_df <- data.frame(Method = combined_data$Method, PCs = pca_result$x)
+
+# Rename the PCA columns to match the column names in pca_result
+colnames(pca_df)[2:ncol(pca_df)] <- colnames(pca_result$x)
+
+# Create a PCA plot using ggplot2
+ggplot(pca_df, aes(x = PC1, y = PC2, color = Method)) +
+  geom_point() +
+  labs(title = "PCA Plot by Method", x = "Principal Component 1", y = "Principal Component 2")
+
+
 #=============================
 #Create fasta file with small RNAs from B. subtilis for bowtie2 depletion (needs loading of gene_info_df in script above)
-  
-  
-  library(Biostrings)
-  
-  # Specify the paths to your GFF and FASTA reference files
-  genome <- readDNAStringSet("C:/Users/aagnoli/OneDrive - UvA/B. subtilis 168 annotation and genome files/WT-Prspb-amyI.fa")
-  
-  # Read the GFF file
-  gff_lines <- readLines("C:/Users/aagnoli/OneDrive - UvA/B. subtilis 168 annotation and genome files/wt-prspb-amyI-GFF3.gff")
-  
-  # Filter gene_info_df to select entries starting with "BSU_misc"
-  filtered_gene_info_df <- gene_info_df[grep("^BSU_misc", gene_info_df$LocusTag), ]
-  
-  # Create a character vector to store the FASTA entries
-  fasta_entries <- character()
-  
-  # Loop through the filtered data and create FASTA entries
-  for (i in 1:nrow(filtered_gene_info_df)) {
-    locus_tag <- filtered_gene_info_df$LocusTag[i]
-    sequence <- filtered_gene_info_df$Sequence[i]
-    fasta_entry <- paste(">", locus_tag, "\n", sequence, sep = "")
-    fasta_entries <- c(fasta_entries, fasta_entry)
-  }
-  
-  # Write the FASTA entries to a file
-  writeLines(fasta_entries, "C:/Users/aagnoli/OneDrive - UvA/B. subtilis 168 annotation and genome files/BSU_misc_genes.fasta")
+
+
+library(Biostrings)
+
+# Specify the paths to your GFF and FASTA reference files
+genome <- readDNAStringSet("C:/Users/aagnoli/OneDrive - UvA/B. subtilis 168 annotation and genome files/WT-Prspb-amyI.fa")
+
+# Read the GFF file
+gff_lines <- readLines("C:/Users/aagnoli/OneDrive - UvA/B. subtilis 168 annotation and genome files/wt-prspb-amyI-GFF3.gff")
+
+# Filter gene_info_df to select entries starting with "BSU_misc"
+filtered_gene_info_df <- gene_info_df[grep("^BSU_misc", gene_info_df$LocusTag), ]
+
+# Create a character vector to store the FASTA entries
+fasta_entries <- character()
+
+# Loop through the filtered data and create FASTA entries
+for (i in 1:nrow(filtered_gene_info_df)) {
+  locus_tag <- filtered_gene_info_df$LocusTag[i]
+  sequence <- filtered_gene_info_df$Sequence[i]
+  fasta_entry <- paste(">", locus_tag, "\n", sequence, sep = "")
+  fasta_entries <- c(fasta_entries, fasta_entry)
+}
+
+# Write the FASTA entries to a file
+writeLines(fasta_entries, "C:/Users/aagnoli/OneDrive - UvA/B. subtilis 168 annotation and genome files/BSU_misc_genes.fasta")

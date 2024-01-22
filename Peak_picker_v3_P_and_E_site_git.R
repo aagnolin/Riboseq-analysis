@@ -166,25 +166,25 @@ for (input_file in input_files) {
       theme(axis.line = element_line(linetype = "solid")) + 
       theme(axis.line = element_line(linetype = "blank"),
             panel.grid.major = element_line(colour = "gray89",
-                                          linetype = "blank"),
+                                            linetype = "blank"),
             panel.grid.minor = element_line(linetype = "blank"),
             panel.background = element_rect(linetype = "solid")) + theme(axis.text.x = element_text(vjust = 0.5,
-    angle = 45))
-      
-  
-  # Generate the output file path for the plot
-  output_file_density_plot <- file.path(output_folder, paste0(file_path_sans_ext(basename(input_file)), "density_plot_cutoff.svg"))
-  
-  # Set the desired width and height for the SVG plot
-  plot_width <- 4.375  # Specify the width in pixels
-  plot_height <- 3.0208  # Specify the height in pixels
-  
-  # Export the plot as an SVG image with the specified size
-  svg(output_file_density_plot, width = plot_width, height = plot_height)
-  print(density_plot)
-  dev.off()
-  
-  message('Density plot of peaks with selected threshold has been generated')
+                                                                                                    angle = 45))
+    
+    
+    # Generate the output file path for the plot
+    output_file_density_plot <- file.path(output_folder, paste0(file_path_sans_ext(basename(input_file)), "density_plot_cutoff.svg"))
+    
+    # Set the desired width and height for the SVG plot
+    plot_width <- 4.375  # Specify the width in pixels
+    plot_height <- 3.0208  # Specify the height in pixels
+    
+    # Export the plot as an SVG image with the specified size
+    svg(output_file_density_plot, width = plot_width, height = plot_height)
+    print(density_plot)
+    dev.off()
+    
+    message('Density plot of peaks with selected threshold has been generated')
   }
   
   # Generate the output file path for the pause codon output and codon occupancy output
@@ -192,8 +192,8 @@ for (input_file in input_files) {
   
   # Write the filtered data to the output file
   write.csv(Super_codonator_output, file = output_pause_codon, row.names = FALSE)
- 
-   # Print a message indicating the completion
+  
+  # Print a message indicating the completion
   cat("Processed file:", input_file, "\n")
   
   # Print a final completion message
