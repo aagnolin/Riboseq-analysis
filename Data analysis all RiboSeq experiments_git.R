@@ -1,5 +1,5 @@
 #Data analysis Riboseq experiments
-#github aagnolin
+#github aagnolin https://github.com/aagnolin
 
 library(tidyverse)
 library(readxl)

@@ -1,3 +1,5 @@
+#github aagnolin https://github.com/aagnolin
+
 # Check if the user requests help or specifies the method
 if (length(commandArgs(trailingOnly = TRUE)) == 0 || any(commandArgs(trailingOnly = TRUE) %in% c("-h", "--help"))) {
   cat("Script Usage:\n")
