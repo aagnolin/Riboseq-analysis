@@ -202,7 +202,7 @@ for (input_file in input_files) {
   cat("Dataset successfully written to the output folder\n")
   
   # Read the Codon usage table
-  Codon_usage_table_combined_ORF_file_Alberto <- read_excel(codon_table)
+  Codon_usage_table <- read_excel(codon_table)
   
   # Calculate codon observations method "single" for Pause_codon
   if (method == "single") {
@@ -248,7 +248,7 @@ for (input_file in input_files) {
   )
   
   # Merge occupancy data frames with usage data frame
-  Merged_occupancy_and_usage <- merge(codon_df_pause, Codon_usage_table_combined_ORF_file_Alberto, by = "Codon", all = TRUE)
+  Merged_occupancy_and_usage <- merge(codon_df_pause, Codon_usage_table, by = "Codon", all = TRUE)
   Merged_occupancy_and_usage <- merge(Merged_occupancy_and_usage, codon_df_P_site, by = "Codon", all = TRUE)
   Merged_occupancy_and_usage <- merge(Merged_occupancy_and_usage, codon_df_E_site, by = "Codon", all = TRUE)
   
