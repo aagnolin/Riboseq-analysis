@@ -122,9 +122,10 @@ for (input_file in input_files) {
     arrange(position) %>%
     select(-modulus)
   
-  #Calculate and add Pause score column
+  #Calculate ribosome coverage per gene and Pause score, then add it as a new column
+  Super_codonator_output <- Super_codonator_output %>% group_by(gene) %>% mutate(Ribosome_coverage_per_gene = sum(count/gene_length))
+  Super_codonator_output <- Super_codonator_output %>% group_by(gene) %>% mutate(Pause_score = count/Ribosome_coverage_per_gene)
   
-  Super_codonator_output <- Super_codonator_output %>% group_by(gene) %>% mutate(Pause_score = count/sum(count))
   
   # Apply optional filtering if the filter_threshold is provided
   if (!is.na(filter_threshold)) {
