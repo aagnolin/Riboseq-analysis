@@ -88,7 +88,7 @@ for (input_file in input_files) {
   # Generate files with extracted pause codon for each peak
   cat("Extracting pause codon from input files...\n")
   
-  # Perform the desired actions on the data
+  # Calculate the coding frame and extract the codons in the A (Pause), P and E sites 
   Alt_predict_modulus <- alt_predict_input %>%
     mutate(modulus = offset %% 3) %>%
     mutate(modulus = ifelse(is.na(modulus), 5, modulus))
@@ -121,6 +121,10 @@ for (input_file in input_files) {
   Super_codonator_output <- bind_rows(output_NA, output_0, output_1, output_2) %>%
     arrange(position) %>%
     select(-modulus)
+  
+  #Calculate and add Pause score column
+  
+  Super_codonator_output <- Super_codonator_output %>% group_by(gene) %>% mutate(Pause_score = count/sum(count))
   
   # Apply optional filtering if the filter_threshold is provided
   if (!is.na(filter_threshold)) {
@@ -189,7 +193,7 @@ for (input_file in input_files) {
     message('Density plot of peaks with selected threshold has been generated')
   }
   
-  # Generate the output file path for the pause codon output and codon occupancy output
+  # Generate the output file path for the pause codon output
   output_pause_codon <- file.path(output_folder, paste0(file_path_sans_ext(basename(input_file)), "_pause_codon_output.csv"))
   
   # Write the filtered data to the output file
