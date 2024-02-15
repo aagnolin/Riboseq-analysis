@@ -213,15 +213,19 @@ for (input_file in input_files) {
   #Calculate Codon Pause Score
   #method "single" for Pause_codon
   if (method == "single") {
-  Codon_pause_score_df <- Super_codonator_output %>% group_by(Pause_codon) %>% summarise(Codon_pause_score = sum(Pause_score))
-  Super_codonator_output_ORFs <- Super_codonator_output %>% drop_na(Pause_codon)
-  Total_counts_ORFs <- sum(Super_codonator_output_ORFs$Norm_count)
-  Codon_pause_score_df <- Codon_pause_score_df %>% mutate(Normalised_codon_pause_score = Codon_pause_score_df$Codon_pause_score/Total_counts_ORFs)
-  Codon_pause_score_df <- rename(Codon_pause_score_df, Codon = Pause_codon)
+    Codon_pause_score_df_A_site <- Super_codonator_output %>% group_by(Pause_codon) %>% summarise(Codon_pause_score_A_site = sum(Pause_score)) %>% rename(Codon = Pause_codon)
+    Codon_pause_score_df_P_site <- Super_codonator_output %>% group_by(P_site) %>% summarise(Codon_pause_score_P_site = sum(Pause_score)) %>% rename(Codon = P_site)
+    Codon_pause_score_df_E_site <- Super_codonator_output %>% group_by(E_site) %>% summarise(Codon_pause_score_E_site = sum(Pause_score)) %>% rename(Codon = E_site)
+    Codon_pause_score_df <- merge(Codon_pause_score_df_A_site, Codon_pause_score_df_E_site, by = "Codon") %>% merge(Codon_pause_score_df_P_site, by = "Codon")
+    Super_codonator_output_ORFs <- Super_codonator_output %>% drop_na(Pause_codon)
+    Total_counts_ORFs <- sum(Super_codonator_output_ORFs$Norm_count)
+    Codon_pause_score_df <- Codon_pause_score_df %>% mutate(Normalised_codon_pause_score = Codon_pause_score_df$Codon_pause_score_A_site/Total_counts_ORFs, 
+                                                            Normalised_codon_pause_score_P_site = Codon_pause_score_df$Codon_pause_score_P_site/Total_counts_ORFs, 
+                                                            Normalised_codon_pause_score_E_site = Codon_pause_score_df$Codon_pause_score_E_site/Total_counts_ORFs)
   }
   
   # Merge occupancy data frames with usage data frame
-  Merged_normalised_codon_pause_score_and_usage <- merge(Codon_pause_score_df, Codon_usage_table, by = "Codon", all = TRUE) %>% select(-2)
+  Merged_normalised_codon_pause_score_and_usage <- merge(Codon_pause_score_df, Codon_usage_table, by = "Codon", all = TRUE) %>% select(-2,-3,-4)
   
   # Generate the output file path for the codon occupancy output
   output_codon_occupancy <- file.path(output_folder, paste0(file_path_sans_ext(basename(input_file)), "_codon_occupancy_output.csv"))
@@ -242,8 +246,8 @@ for (input_file in input_files) {
     geom_smooth(method = "lm", se = FALSE, color = "blue") +
     #stat_cor(label.y = 0.1, label.x = 0.7, method = "pearson") +
     geom_text(aes(label = Codon), vjust = -0.5, alpha = 0.5, size = 3) +
-    #scale_y_continuous(limits = c(0, 0.76)) +
-    #scale_x_continuous(limits = c(0, 0.02)) +
+    #scale_y_continuous(limits = c(0, 0.70)) + #add this if you need a fixed range
+    #scale_x_continuous(limits = c(0, 0.02)) + #add this if you need a fixed range
     theme_bw() +
     labs(y = "Normalised Codon Pause Score") +
     theme(plot.subtitle = element_text(face = "bold"),
