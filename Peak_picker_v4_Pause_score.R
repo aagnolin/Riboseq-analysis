@@ -123,8 +123,8 @@ for (input_file in input_files) {
     select(-modulus)
   
   #Calculate ribosome coverage per gene and Pause score, then add it as a new column
-  Super_codonator_output <- Super_codonator_output %>% group_by(gene) %>% mutate(Ribosome_coverage_per_gene = sum(count/gene_length))
-  Super_codonator_output <- Super_codonator_output %>% group_by(gene) %>% mutate(Pause_score = count/Ribosome_coverage_per_gene)
+  Super_codonator_output <- Super_codonator_output %>% group_by(gene) %>% mutate(Ribosome_coverage_per_gene = sum(Norm_count/gene_length))
+  Super_codonator_output <- Super_codonator_output %>% group_by(gene) %>% mutate(Pause_score = Norm_count/Ribosome_coverage_per_gene)
   
   
   # Apply optional filtering if the filter_threshold is provided
@@ -211,11 +211,12 @@ for (input_file in input_files) {
   
   #Calculate Codon Pause Score
   Codon_pause_score_df <- Super_codonator_output %>% group_by(Pause_codon) %>% summarise(Codon_pause_score = sum(Pause_score))
-  total_entries_pause <- nrow(Super_codonator_output %>% drop_na(Pause_codon))
-  Codon_pause_score_df <- Codon_pause_score_df %>% mutate(Normalised_codon_pause_score = Codon_pause_score_df$Codon_pause_score/total_entries_pause)
+  Super_codonator_output_ORFs <- Super_codonator_output %>% drop_na(Pause_codon)
+  Total_counts_ORFs <- sum(Super_codonator_output_ORFs$Norm_count)
+  Codon_pause_score_df <- Codon_pause_score_df %>% mutate(Normalised_codon_pause_score = Codon_pause_score_df$Codon_pause_score/Total_counts_ORFs)
   Codon_pause_score_df <- rename(Codon_pause_score_df, Codon = Pause_codon)
   # Merge occupancy data frames with usage data frame
-  Merged_normalised_codon_pause_score_and_usage <- merge(Codon_pause_score_df, Codon_usage_table, by = "Codon", all = TRUE)
+  Merged_normalised_codon_pause_score_and_usage <- merge(Codon_pause_score_df, Codon_usage_table, by = "Codon", all = TRUE) %>% select(-2)
   
   # Generate the output file path for the codon occupancy output
   output_codon_occupancy <- file.path(output_folder, paste0(file_path_sans_ext(basename(input_file)), "_codon_occupancy_output.csv"))
@@ -236,8 +237,8 @@ for (input_file in input_files) {
     geom_smooth(method = "lm", se = FALSE, color = "blue") +
     #stat_cor(label.y = 0.1, label.x = 0.7, method = "pearson") +
     geom_text(aes(label = Codon), vjust = -0.5, alpha = 0.5, size = 3) +
-    scale_y_continuous(limits = c(0, 0.76)) +
-    scale_x_continuous(limits = c(0, 0.02)) +
+    #scale_y_continuous(limits = c(0, 0.76)) +
+    #scale_x_continuous(limits = c(0, 0.02)) +
     theme_bw() +
     theme(plot.subtitle = element_text(face = "bold"),
           plot.caption = element_text(face = "bold"),
