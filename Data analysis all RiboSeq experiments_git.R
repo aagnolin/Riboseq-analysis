@@ -71,6 +71,17 @@ No_treatment_2 <- read_csv(file = "C:/Users/aagnoli/OneDrive - UvA/RNA sequencin
 Tet_1 <- read_csv(file = "C:/Users/aagnoli/OneDrive - UvA/RNA sequencing data/Global analysis fixation conditions/Tet_1.csv")
 Tet_2 <- read_csv(file = "C:/Users/aagnoli/OneDrive - UvA/RNA sequencing data/Global analysis fixation conditions/Tet_2.csv")
 
+#-----------------------------------------------------
+
+#ppGpp (Chloramphenicol)
+WT_8h_1_35_full <- read_csv("C:/Users/aagnoli/OneDrive - UvA/RNA sequencing data/Results 14-02-23 Yaozu ppGpp and codon exchange analysis/Results 14-02-23 Yaozu ppGpp and codon exchange analysis/ppGpp/212_8h_1_35_full.csv")
+WT_8h_2_35_full <- read_csv("C:/Users/aagnoli/OneDrive - UvA/RNA sequencing data/Results 14-02-23 Yaozu ppGpp and codon exchange analysis/Results 14-02-23 Yaozu ppGpp and codon exchange analysis/ppGpp/212_8h_2_35_full.csv")
+WT_16h_1_35_full <- read_csv(file = "C:/Users/aagnoli/OneDrive - UvA/Riboseq datasets and plots/16h-1_Ribo_35_full.csv") #This is the same dataset as 16h_1 (long fermentation experiment)
+WT_16h_2_35_full <- read_csv(file = "C:/Users/aagnoli/OneDrive - UvA/Riboseq datasets and plots/16h-2_Ribo_35_full.csv") #This is the same dataset as 16h_2 (long fermentation experiment)
+ppGpp_8h_1_35_full <- read_csv("C:/Users/aagnoli/OneDrive - UvA/RNA sequencing data/Results 14-02-23 Yaozu ppGpp and codon exchange analysis/Results 14-02-23 Yaozu ppGpp and codon exchange analysis/ppGpp/ppGpp_8h_1_35_full.csv")
+ppGpp_8h_2_35_full <- read_csv("C:/Users/aagnoli/OneDrive - UvA/RNA sequencing data/Results 14-02-23 Yaozu ppGpp and codon exchange analysis/Results 14-02-23 Yaozu ppGpp and codon exchange analysis/ppGpp/ppGpp_8h_2_35_full.csv")
+ppGpp_16h_1_35_full <- read_csv("C:/Users/aagnoli/OneDrive - UvA/RNA sequencing data/Results 14-02-23 Yaozu ppGpp and codon exchange analysis/Results 14-02-23 Yaozu ppGpp and codon exchange analysis/ppGpp/ppGpp_16h_1_35_full.csv")
+ppGpp_16h_2_35_full <- read_csv("C:/Users/aagnoli/OneDrive - UvA/RNA sequencing data/Results 14-02-23 Yaozu ppGpp and codon exchange analysis/Results 14-02-23 Yaozu ppGpp and codon exchange analysis/ppGpp/ppGpp_16h_2_35_full.csv")
 
 ##Merged replicates
 Cm_Avg <- read_csv("C:/Users/aagnoli/OneDrive - UvA/RNA sequencing data/Global analysis fixation conditions/Results/Merged by nucleotide position/Replicates nucleotide/Cm_1_and_2_nucleotide.csv") %>% 
@@ -176,22 +187,86 @@ No_treatment_Avg <- read_csv("C:/Users/aagnoli/OneDrive - UvA/RNA sequencing dat
          -Norm_count.y
   )
 
+WT_8h_Avg <- read_csv("C:/Users/aagnoli/OneDrive - UvA/RNA sequencing data/Global analysis ppGpp/WT_8h_rep1_vs_WT_8h_rep2.csv") %>% 
+  mutate(Avg_Norm_reads = (Norm_count.x + Norm_count.y)/2) %>%
+  select(-genome.y,
+         -strand.y,
+         -gene.y,
+         -gene_length.y,
+         -offset.y,
+         -in_orf_90.y,
+         -count.y,
+         -sequence.y,
+         #-Pause_codon.x,
+         #-Pause_codon.y,
+         -Norm_count.x,
+         -Norm_count.y
+)
+
+WT_16h_Avg <- read_csv("C:/Users/aagnoli/OneDrive - UvA/RNA sequencing data/Global analysis ppGpp/WT_16h_rep2_vs_WT_16h_rep1.csv") %>% 
+  mutate(Avg_Norm_reads = (Norm_count.x + Norm_count.y)/2) %>%
+  select(-genome.y,
+         -strand.y,
+         -gene.y,
+         -gene_length.y,
+         -offset.y,
+         -in_orf_90.y,
+         -count.y,
+         -sequence.y,
+         #-Pause_codon.x,
+         #-Pause_codon.y,
+         -Norm_count.x,
+         -Norm_count.y
+  )
+   
+ppGpp_8h_Avg <- read_csv("C:/Users/aagnoli/OneDrive - UvA/RNA sequencing data/Global analysis ppGpp/ppGpp_8h_rep1_vs_ppGpp_8h_rep2.csv") %>% 
+  mutate(Avg_Norm_reads = (Norm_count.x + Norm_count.y)/2) %>%
+  select(-genome.y,
+         -strand.y,
+         -gene.y,
+         -gene_length.y,
+         -offset.y,
+         -in_orf_90.y,
+         -count.y,
+         -sequence.y,
+         #-Pause_codon.x,
+         #-Pause_codon.y,
+         -Norm_count.x,
+         -Norm_count.y
+  )
+    
+ppGpp_16h_Avg <- read_csv("C:/Users/aagnoli/OneDrive - UvA/RNA sequencing data/Global analysis ppGpp/ppGpp_16h_rep2_vs_ppGpp_16h_rep1.csv") %>% 
+  mutate(Avg_Norm_reads = (Norm_count.x + Norm_count.y)/2) %>%
+  select(-genome.y,
+         -strand.y,
+         -gene.y,
+         -gene_length.y,
+         -offset.y,
+         -in_orf_90.y,
+         -count.y,
+         -sequence.y,
+         #-Pause_codon.x,
+         #-Pause_codon.y,
+         -Norm_count.x,
+         -Norm_count.y
+  )  
+
 #Normalize these averaged datasets
-riboseq_1 <- Tet_Avg
-riboseq_2 <- dsp_Avg
+riboseq_1 <- ppGpp_16h_Avg
+riboseq_2 <- WT_16h_Avg
 
 sum(riboseq_1$Avg_Norm_reads)
 sum(riboseq_2$Avg_Norm_reads)
 
 #Normalize datasets
-Normalized_riboseq_1 <- mutate(riboseq_1, Norm_count = riboseq_1$Avg_Norm_reads*(sum(riboseq_1$Avg_Norm_reads)/sum(riboseq_1$Avg_Norm_reads)))
-Normalized_riboseq_2 <- mutate(riboseq_2, Norm_count = riboseq_2$Avg_Norm_reads*(sum(riboseq_1$Avg_Norm_reads)/sum(riboseq_2$Avg_Norm_reads)))
+Normalized_riboseq_1 <- mutate(riboseq_1, Norm_count = riboseq_1$Avg_Norm_reads*(sum(riboseq_1$Avg_Norm_reads)/sum(riboseq_1$Avg_Norm_reads))) #from now on, use the Norm_count column for further analysis
+Normalized_riboseq_2 <- mutate(riboseq_2, Norm_count = riboseq_2$Avg_Norm_reads*(sum(riboseq_1$Avg_Norm_reads)/sum(riboseq_2$Avg_Norm_reads))) #from now on, use the Norm_count column for further analysis
 
 #-----------------------------------------------------
 
 #Paste here the name of the 2 files to compare (set file with higher total number of sequences as riboseq_1 for normalization at later steps)
-riboseq_1 <- filtered_2X_Spin_35_full_June_2023
-riboseq_2 <- Mup_reference_filtered_SAM_35_full_rep1
+riboseq_1 <- ppGpp_16h_2_35_full
+riboseq_2 <- ppGpp_16h_1_35_full
 
 #===========================
 #FURTHER CLEANING OF alt_predict DATASETS
@@ -606,7 +681,7 @@ P2 <- barplot(names=Binned.data[which(Binned.data$gene == i2),"start"],
 
 Merged_same_position <- merge(Normalized_riboseq_1, Normalized_riboseq_2, 'position')
 
-cutoff <- 10 #cutoff of number of reads per peak for plotting. Change if desired
+cutoff <- 150 #cutoff of number of reads per peak for plotting. Change if desired
 Merged_same_position_cutoff <- filter(Merged_same_position, Norm_count.x >= cutoff & Norm_count.y >= cutoff)
 
 #linear regression
@@ -625,7 +700,7 @@ summary(linear_model_merged_same_position)$r.squared
 
 cor(Merged_same_position_cutoff$Norm_count.x, Merged_same_position_cutoff$Norm_count.y, method = "pearson")
 
-write_csv(Merged_same_position_cutoff, file = "C:/Users/aagnoli/OneDrive - UvA/RNA sequencing data/Global analysis fixation conditions/Results/Averaged replicates/.csv")
+write_csv(Merged_same_position_cutoff, file = "C:/Users/aagnoli/OneDrive - UvA/RNA sequencing data/Global analysis ppGpp/Avg_ppGpp_16h_vs_Avg_WT_16h_nt_merge.csv")
 
 #total least squares regression (mean centered data)
 
@@ -660,7 +735,9 @@ ggplot(data = as.data.frame(logData),
   geom_abline(intercept = 0, slope = 1, col = "red", lwd = 1) +
   annotate("text", x = 1, y = max(logData[, 2]), label = paste("Green: ", equation), hjust = 1, vjust = 1, size = 4)
 
-
+Output_tls_nt_replicates <- as.data.frame(logData) %>% rename(Norm_count.x = V1, Norm_count.y = V2)
+Output_tls_nt_replicates <- cbind(Output_tls_nt_replicates, explained_variance, equation)
+write.csv(Output_tls_nt_replicates, file = "C:/Users/aagnoli/Desktop/Avg_ppGpp_16h_vs_Avg_WT_16h_tls_cutoff_150.csv", row.names = F)
 ## 1) comparison scatter plots on codon level --> merge codons based on 0,+1,+2 positions (0,+1,+2 being the nucleotides in a codon) --> NOTE: This ONLY includes peaks inside ORFs
 
 Merged_same_position_codon <- merge(Normalized_riboseq_1, Normalized_riboseq_2, 'position') %>%  mutate(codon_position = ceiling(offset.x/3))
@@ -829,7 +906,7 @@ ggplot(data = as.data.frame(logData_codon_floor),
 
 #SEQUENCE LENGTH DISTRIBUTION
 
-ggplot(data = filter(Sequence_length_distributions_all_samples, Sample == "Mupirocin sucrose", `Date of Experiment` == "Nov-20"),
+ggplot(data = filter(Sequence_length_distributions_all_samples, Sample == "Histag Lysate", `Date of Experiment` == "Jun-23"),
        mapping = aes(
          x = `Length (nt)`,
          y = Frequency
