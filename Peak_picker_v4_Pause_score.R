@@ -53,6 +53,7 @@ library(ggplot2)
 library(readxl)
 library(ggpubr)
 library(tools)
+library(tidyr)
 
 # Get the input and output folder paths from command-line arguments
 input_folder <- commandArgs(trailingOnly = TRUE)[1]
@@ -210,11 +211,15 @@ for (input_file in input_files) {
   Codon_usage_table <- read_excel(codon_table)
   
   #Calculate Codon Pause Score
+  #method "single" for Pause_codon
+  if (method == "single") {
   Codon_pause_score_df <- Super_codonator_output %>% group_by(Pause_codon) %>% summarise(Codon_pause_score = sum(Pause_score))
   Super_codonator_output_ORFs <- Super_codonator_output %>% drop_na(Pause_codon)
   Total_counts_ORFs <- sum(Super_codonator_output_ORFs$Norm_count)
   Codon_pause_score_df <- Codon_pause_score_df %>% mutate(Normalised_codon_pause_score = Codon_pause_score_df$Codon_pause_score/Total_counts_ORFs)
   Codon_pause_score_df <- rename(Codon_pause_score_df, Codon = Pause_codon)
+  }
+  
   # Merge occupancy data frames with usage data frame
   Merged_normalised_codon_pause_score_and_usage <- merge(Codon_pause_score_df, Codon_usage_table, by = "Codon", all = TRUE) %>% select(-2)
   
@@ -240,6 +245,7 @@ for (input_file in input_files) {
     #scale_y_continuous(limits = c(0, 0.76)) +
     #scale_x_continuous(limits = c(0, 0.02)) +
     theme_bw() +
+    labs(y = "Normalised Codon Pause Score") +
     theme(plot.subtitle = element_text(face = "bold"),
           plot.caption = element_text(face = "bold"),
           axis.title = element_text(face = "bold"),
