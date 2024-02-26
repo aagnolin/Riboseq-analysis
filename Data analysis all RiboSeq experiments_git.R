@@ -251,9 +251,69 @@ ppGpp_16h_Avg <- read_csv("C:/Users/aagnoli/OneDrive - UvA/RNA sequencing data/G
          -Norm_count.y
   )  
 
+x2X_Spin_Avg <- read_csv("C:/Users/aagnoli/OneDrive - UvA/WP 1 - RiboSeq/Manuscript Spin-PEG/Data peak comparisons with tls/Avg_2X_Spin_Jun_and_Jan.csv") %>% 
+  mutate(Avg_Norm_reads = (Norm_count.x + Norm_count.y)/2) %>%
+  select(-genome.y,
+         -strand.y,
+         -gene.y,
+         -gene_length.y,
+         -offset.y,
+         -in_orf_90.y,
+         -count.y,
+         -sequence.y,
+         #-Pause_codon.x,
+         #-Pause_codon.y,
+         -Norm_count.x,
+         -Norm_count.y
+  )  
+x2X_PEG_Avg <- read_csv("C:/Users/aagnoli/OneDrive - UvA/WP 1 - RiboSeq/Manuscript Spin-PEG/Data peak comparisons with tls/Avg_2X_PEG_Jul_and_Jan.csv") %>% 
+  mutate(Avg_Norm_reads = (Norm_count.x + Norm_count.y)/2) %>%
+  select(-genome.y,
+         -strand.y,
+         -gene.y,
+         -gene_length.y,
+         -offset.y,
+         -in_orf_90.y,
+         -count.y,
+         -sequence.y,
+         #-Pause_codon.x,
+         #-Pause_codon.y,
+         -Norm_count.x,
+         -Norm_count.y
+  )  
+x1X_PEG_Spin_Avg <- read_csv("C:/Users/aagnoli/OneDrive - UvA/WP 1 - RiboSeq/Manuscript Spin-PEG/Data peak comparisons with tls/Avg_1X_PEG-Spin_Jan_and_Jul.csv") %>% 
+  mutate(Avg_Norm_reads = (Norm_count.x + Norm_count.y)/2) %>%
+  select(-genome.y,
+         -strand.y,
+         -gene.y,
+         -gene_length.y,
+         -offset.y,
+         -in_orf_90.y,
+         -count.y,
+         -sequence.y,
+         #-Pause_codon.x,
+         #-Pause_codon.y,
+         -Norm_count.x,
+         -Norm_count.y
+  )  
+Mup_Avg <- read_csv("C:/Users/aagnoli/OneDrive - UvA/WP 1 - RiboSeq/Manuscript Spin-PEG/Data peak comparisons with tls/Avg_Mup_1_and_2.csv") %>% 
+  mutate(Avg_Norm_reads = (Norm_count.x + Norm_count.y)/2) %>%
+  select(-genome.y,
+         -strand.y,
+         -gene.y,
+         -gene_length.y,
+         -offset.y,
+         -in_orf_90.y,
+         -count.y,
+         -sequence.y,
+         #-Pause_codon.x,
+         #-Pause_codon.y,
+         -Norm_count.x,
+         -Norm_count.y
+  )  
 #Normalize these averaged datasets
-riboseq_1 <- ppGpp_16h_Avg
-riboseq_2 <- WT_16h_Avg
+riboseq_1 <- Mup_Avg
+riboseq_2 <- x2X_Spin_Avg
 
 sum(riboseq_1$Avg_Norm_reads)
 sum(riboseq_2$Avg_Norm_reads)
@@ -265,9 +325,9 @@ Normalized_riboseq_2 <- mutate(riboseq_2, Norm_count = riboseq_2$Avg_Norm_reads*
 #-----------------------------------------------------
 
 #Paste here the name of the 2 files to compare (set file with higher total number of sequences as riboseq_1 for normalization at later steps)
-riboseq_1 <- ppGpp_16h_2_35_full
-riboseq_2 <- ppGpp_16h_1_35_full
-
+riboseq_1 <- Mup_reference_filtered_SAM_35_full_rep1
+riboseq_2 <- Mup_reference_filtered_SAM_35_full_rep2
+  
 #===========================
 #FURTHER CLEANING OF alt_predict DATASETS
 ##some tRNAs and rRNAs still remain in the tables after removal with bowtie2. Moreover, small RNAs like ssrA are not removed with Bowtie2.
@@ -681,7 +741,7 @@ P2 <- barplot(names=Binned.data[which(Binned.data$gene == i2),"start"],
 
 Merged_same_position <- merge(Normalized_riboseq_1, Normalized_riboseq_2, 'position')
 
-cutoff <- 150 #cutoff of number of reads per peak for plotting. Change if desired
+cutoff <- 10 #cutoff of number of reads per peak for plotting. Change if desired
 Merged_same_position_cutoff <- filter(Merged_same_position, Norm_count.x >= cutoff & Norm_count.y >= cutoff)
 
 #linear regression
@@ -700,7 +760,7 @@ summary(linear_model_merged_same_position)$r.squared
 
 cor(Merged_same_position_cutoff$Norm_count.x, Merged_same_position_cutoff$Norm_count.y, method = "pearson")
 
-write_csv(Merged_same_position_cutoff, file = "C:/Users/aagnoli/OneDrive - UvA/RNA sequencing data/Global analysis ppGpp/Avg_ppGpp_16h_vs_Avg_WT_16h_nt_merge.csv")
+write_csv(Merged_same_position_cutoff, file = "C:/Users/aagnoli/OneDrive - UvA/WP 1 - RiboSeq/Manuscript Spin-PEG/Data peak comparisons with tls/Avg_Mup_1_and_2.csv")
 
 #total least squares regression (mean centered data)
 
@@ -737,7 +797,7 @@ ggplot(data = as.data.frame(logData),
 
 Output_tls_nt_replicates <- as.data.frame(logData) %>% rename(Norm_count.x = V1, Norm_count.y = V2)
 Output_tls_nt_replicates <- cbind(Output_tls_nt_replicates, explained_variance, equation)
-write.csv(Output_tls_nt_replicates, file = "C:/Users/aagnoli/Desktop/Avg_ppGpp_16h_vs_Avg_WT_16h_tls_cutoff_150.csv", row.names = F)
+write.csv(Output_tls_nt_replicates, file = "C:/Users/aagnoli/OneDrive - UvA/WP 1 - RiboSeq/Manuscript Spin-PEG/Data peak comparisons with tls/.csv", row.names = F)
 ## 1) comparison scatter plots on codon level --> merge codons based on 0,+1,+2 positions (0,+1,+2 being the nucleotides in a codon) --> NOTE: This ONLY includes peaks inside ORFs
 
 Merged_same_position_codon <- merge(Normalized_riboseq_1, Normalized_riboseq_2, 'position') %>%  mutate(codon_position = ceiling(offset.x/3))
@@ -817,7 +877,7 @@ ggplot(data = as.data.frame(logData_codon),
 #-----------------------
 ## 2) comparison scatter plots on codon level - Different codon merge method --> merge codons based on -1,0,+1 positions (0,+1,+2 being the nucleotides in a codon) --> NOTE: This ONLY includes peaks inside ORFs
 
-Merged_same_position_codon_floor <- merge(Normalized_riboseq_1, Normalized_riboseq_2, 'position') %>%  mutate(codon_position = floor(offset.x/3))
+Merged_same_position_codon_floor <- merge(Normalized_riboseq_1, Normalized_riboseq_2, 'position') %>%  mutate(codon_position = floor(offset.x.x/3))
 Merged_same_position_codon_floor <- Merged_same_position_codon_floor %>% select(-genome.y,
                                                                                 -strand.y,
                                                                                 -gene.y,
@@ -830,11 +890,11 @@ Merged_same_position_codon_floor <- Merged_same_position_codon_floor %>% select(
 )
 ###Sum the number of reads in each codon
 Merged_codon_summed_reads_floor <- Merged_same_position_codon_floor %>% 
-  group_by(gene.x, codon_position) %>% summarise(sum_reads_per_codon.x = sum(Norm_count.x),
+  group_by(gene.x.x, codon_position) %>% summarise(sum_reads_per_codon.x = sum(Norm_count.x),
                                                  sum_reads_per_codon.y = sum(Norm_count.y)) %>%  
-  filter(!is.na(gene.x))
+  filter(!is.na(gene.x.x))
 
-cutoff <- 1 #cutoff of number of reads per peak for plotting. Change if desired
+cutoff <- 10 #cutoff of number of reads per peak for plotting. Change if desired
 Merged_codon_summed_reads_cutoff_floor <- filter(Merged_codon_summed_reads_floor, sum_reads_per_codon.x >= cutoff & sum_reads_per_codon.y >= cutoff)
 
 ###compute linear model for trend line (log10-transformed to make a line for plotting)
@@ -899,9 +959,27 @@ ggplot(data = as.data.frame(logData_codon_floor),
        mapping = aes(x = V1,
                      y = V2)) +
   geom_point(size = 1, alpha = 0.3) +
-  geom_abline(intercept = coefficients_tls_line_codon_floor[1], slope = coefficients_tls_line_codon_floor[2], col = "green", linewidth = 1) +
+  geom_abline(intercept = coefficients_tls_line_codon_floor[1], slope = coefficients_tls_line_codon_floor[2], col = "darkgreen", linewidth = 1) +
   #geom_abline(intercept = 0, slope = 1, col = "red", lwd = 1) + #45 degrees line
-  annotate("text", x = 1, y = max(logData_codon_floor[, 2]), label = paste("Green: ", equation_codon_floor), hjust = 1, vjust = 1, size = 4)
+  annotate("text", x = 1, y = max(logData_codon_floor[, 2]), label = paste0("Explained variance = ", round(explained_variance_floor, 2), "%"), hjust = 0.05, vjust = 1, size = 4) +
+  theme_bw() +
+  labs(x = "Counts 2X Spin",
+       y = "Counts Sucrose") +
+  theme(plot.subtitle = element_text(face = "bold"),
+        plot.caption = element_text(face = "bold"),
+        axis.title = element_text(face = "bold"),
+        plot.title = element_text(face = "bold"),
+        legend.title = element_text(face = "bold"),
+        legend.key = element_rect(linetype = "solid")) +
+  theme(axis.ticks = element_line(linewidth = 0.5)) + 
+  theme(panel.background = element_rect(fill = NA)) + 
+  theme(axis.line = element_line(linetype = "solid")) + 
+  theme(axis.line = element_line(linetype = "blank"), 
+        panel.grid.major = element_line(colour = "gray89",
+                                        linetype = "blank"),
+        panel.grid.minor = element_line(linetype = "blank"),
+        panel.background = element_rect(linetype = "solid"))
+
 #==================================================
 
 #SEQUENCE LENGTH DISTRIBUTION
@@ -1131,7 +1209,8 @@ Plot <- ggplot(data = filter(filtered_data, position >= 4216116, position <= 421
         axis.title = element_text(face = "bold"),
         axis.text = element_text(face = "bold")) +
   labs(x = "Position", y = "Norm_count") +
-  annotate("text", x = Inf, y = Inf, label = paste("Gene is on", ifelse(filtered_gene_info_df$Strand == "-", "-", "+"), "strand"), color = "black", hjust = 1.03, vjust = 1.2, size = 3) #indicate if gene coding frame is sense or antisense
+  annotate("text", x = Inf, y = Inf, label = paste("Gene is on", ifelse(filtered_gene_info_df$Strand == "-", "-", "+"), "strand"), color = "black", hjust = 1.03, vjust = 1.2, size = 3) + #indicate if gene coding frame is sense or antisense 
+  theme(panel.background = element_rect(fill = "gray48"))
 
 #Visualize only comparison plot
 Plot  
@@ -1139,16 +1218,23 @@ Plot
 # Plot the data with arrows colored by codon
 codon_colors <- c("magenta", "limegreen", "cyan")
 
-Plot +
+# Create a custom color palette for the three codons
+custom_color_palette <- c("ATA" = codon_colors[1],
+                          "ATC" = codon_colors[2],
+                          "ATT" = codon_colors[3])
+
+Plot +  
+  #scale_y_continuous(limits = c(0,500)) +
   geom_segment(data = vlines_df, aes(x = Position, y = 0,
                                      xend = Position, yend = 0.1,
                                      color = IsoleucineCodon),
                arrow = arrow(length = unit(0.05, "inches"), type = 'closed'), alpha = 0.5, lineend = 'butt', linejoin = 'mitre') +
-  scale_color_manual(values = codon_colors) +
+  scale_color_manual(values = custom_color_palette) +
   guides(color = guide_legend(title = "Isoleucine Codon")) +
   theme(legend.position = c(0.05, 0.95),  # Adjust these values to position the legend
         legend.justification = c(0, 1),
-        legend.box.just = "left")
+        legend.box.just = "left") + theme(legend.title = element_text(face = "bold"),
+    legend.position = "top", legend.direction = "horizontal")
 
 #=====================================
 
