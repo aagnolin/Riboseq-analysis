@@ -89,32 +89,32 @@ for (input_file in input_files) {
   # Generate files with extracted pause codon for each peak
   cat("Extracting pause codon from input files...\n")
   
-  # Calculate the coding frame and extract the codons in the A (Pause), P and E sites 
+  # Calculate the coding frame and extract the codons in the A, P and E sites 
   Alt_predict_modulus <- alt_predict_input %>%
     mutate(modulus = offset %% 3) %>%
     mutate(modulus = ifelse(is.na(modulus), 5, modulus))
   
   output_NA <- Alt_predict_modulus %>%
     filter(modulus == 5) %>%
-    mutate(Pause_codon = NA, P_site = NA, E_site = NA)
+    mutate(A_site = NA, P_site = NA, E_site = NA)
   
   output_0 <- Alt_predict_modulus %>%
     filter(modulus == 0) %>%
-    mutate(Pause_codon = str_sub(sequence, 51, 53), 
+    mutate(A_site = str_sub(sequence, 51, 53), 
            P_site = str_sub(sequence, 48, 50),
            E_site = str_sub(sequence, 45, 47),
            motif_input_sequence = str_sub(sequence, 42, 65))
   
   output_1 <- Alt_predict_modulus %>%
     filter(modulus == 1) %>%
-    mutate(Pause_codon = str_sub(sequence, 50, 52), 
+    mutate(A_site = str_sub(sequence, 50, 52), 
            P_site = str_sub(sequence, 47, 49),
            E_site = str_sub(sequence, 44, 46),
            motif_input_sequence = str_sub(sequence, 41, 64))
   
   output_2 <- Alt_predict_modulus %>%
     filter(modulus == 2) %>%
-    mutate(Pause_codon = str_sub(sequence, 49, 51), 
+    mutate(A_site = str_sub(sequence, 49, 51), 
            P_site = str_sub(sequence, 46, 48),
            E_site = str_sub(sequence, 43, 45),
            motif_input_sequence = str_sub(sequence, 40, 63))
@@ -213,13 +213,13 @@ for (input_file in input_files) {
   #Calculate Codon Pause Score
   #method "single" for Pause_codon
   if (method == "single") {
-    Codon_pause_score_df_A_site <- Super_codonator_output %>% group_by(Pause_codon) %>% summarise(Codon_pause_score_A_site = sum(Pause_score)) %>% rename(Codon = Pause_codon)
+    Codon_pause_score_df_A_site <- Super_codonator_output %>% group_by(A_site) %>% summarise(Codon_pause_score_A_site = sum(Pause_score)) %>% rename(Codon = A_site)
     Codon_pause_score_df_P_site <- Super_codonator_output %>% group_by(P_site) %>% summarise(Codon_pause_score_P_site = sum(Pause_score)) %>% rename(Codon = P_site)
     Codon_pause_score_df_E_site <- Super_codonator_output %>% group_by(E_site) %>% summarise(Codon_pause_score_E_site = sum(Pause_score)) %>% rename(Codon = E_site)
     Codon_pause_score_df <- merge(Codon_pause_score_df_A_site, Codon_pause_score_df_E_site, by = "Codon") %>% merge(Codon_pause_score_df_P_site, by = "Codon")
-    Super_codonator_output_ORFs <- Super_codonator_output %>% drop_na(Pause_codon)
+    Super_codonator_output_ORFs <- Super_codonator_output %>% drop_na(A_site)
     Total_counts_ORFs <- sum(Super_codonator_output_ORFs$Norm_count)
-    Codon_pause_score_df <- Codon_pause_score_df %>% mutate(Normalised_codon_pause_score = Codon_pause_score_df$Codon_pause_score_A_site/Total_counts_ORFs, 
+    Codon_pause_score_df <- Codon_pause_score_df %>% mutate(Normalised_codon_pause_score_A_site = Codon_pause_score_df$Codon_pause_score_A_site/Total_counts_ORFs, 
                                                             Normalised_codon_pause_score_P_site = Codon_pause_score_df$Codon_pause_score_P_site/Total_counts_ORFs, 
                                                             Normalised_codon_pause_score_E_site = Codon_pause_score_df$Codon_pause_score_E_site/Total_counts_ORFs)
   }
@@ -241,7 +241,8 @@ for (input_file in input_files) {
   
   # Generate the plot
   codon_occupancy_plot <- ggplot(data = Merged_normalised_codon_pause_score_and_usage,
-                                 mapping = aes(x = Usage, y = Normalised_codon_pause_score)) +
+                                 mapping = aes(x = Usage, 
+                                               y = Normalised_codon_pause_score_A_site)) +
     geom_point(size = 1) +
     geom_smooth(method = "lm", se = FALSE, color = "blue") +
     #stat_cor(label.y = 0.1, label.x = 0.7, method = "pearson") +
