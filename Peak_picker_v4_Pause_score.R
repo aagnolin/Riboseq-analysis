@@ -71,7 +71,7 @@ for (input_file in input_files) {
   # Perform the desired actions on the data
   ## Filter non-coding RNA out
   alt_predict_input <- filter(alt_predict_input, !grepl("^BSU_", locus_tag))
-  # alt_predict_input <- filter(alt_predict_input, !grepl("^trn_", gene), gene != 'ssrA')
+  # alt_predict_input <- filter(alt_predict_input, !grepl("^trn_", gene), gene != 'ssrA') #change the code to this if the file does not have locus tags
   ## Filter for highest peaks per gene
   filtered_alt_predict <- alt_predict_input %>%
     group_by(gene) %>%
@@ -138,18 +138,18 @@ for (input_file in input_files) {
   if (!is.na(filter_threshold)) {
     
     library(ggbreak)
-    max_count <- max(Super_codonator_output$count)
+    max_count <- max(Super_codonator_output$Norm_count)
     
     density_plot <- ggplot(data = Super_codonator_output,
                            mapping = aes(
-                             x = count
+                             x = Norm_count
                            )) +
       geom_density(adjust = 5, fill = 'red', alpha = 0.3) +
       geom_vline(xintercept = filter_threshold, color = "black", linetype = 'dashed', linewidth = 0.5)
     
     # Calculate the fraction of peaks remaining after applying the filter_threshold
-    total_counts <- nrow(Super_codonator_output)
-    filtered_counts <- nrow(Super_codonator_output_filtered)
+    total_counts <- sum(Super_codonator_output$Norm_count)
+    filtered_counts <- sum(Super_codonator_output_filtered$Norm_count)
     percentage_filtered_counts <- (filtered_counts / total_counts) * 100
     
     # Add the filter_threshold and percentage to the plot
@@ -181,7 +181,7 @@ for (input_file in input_files) {
     
     
     # Generate the output file path for the plot
-    output_file_density_plot <- file.path(output_folder, paste0(file_path_sans_ext(basename(input_file)), "density_plot_cutoff.svg"))
+    output_file_density_plot <- file.path(output_folder, paste0(file_path_sans_ext(basename(input_file)), "_cutoff_", filter_threshold, "_density_plot.svg"))
     
     # Set the desired width and height for the SVG plot
     plot_width <- 4.375  # Specify the width in pixels
@@ -196,10 +196,10 @@ for (input_file in input_files) {
   }
   
   # Generate the output file path for the pause codon output
-  output_pause_codon <- file.path(output_folder, paste0(file_path_sans_ext(basename(input_file)), "_pause_codon_output.csv"))
+  output_pause_codon <- file.path(output_folder, paste0(file_path_sans_ext(basename(input_file)), "_cutoff_", filter_threshold, "_pause_codon_output.csv"))
   
   # Write the filtered data to the output file
-  write.csv(Super_codonator_output, file = output_pause_codon, row.names = FALSE)
+  write.csv(Super_codonator_output_filtered, file = output_pause_codon, row.names = FALSE)
   
   # Print a message indicating the completion
   cat("Processed file:", input_file, "\n")
@@ -213,12 +213,12 @@ for (input_file in input_files) {
   #Calculate Codon Pause Score
   #method "single" for Pause_codon
   if (method == "single") {
-    Codon_pause_score_df_A_site <- Super_codonator_output %>% group_by(A_site) %>% summarise(Codon_pause_score_A_site = sum(Pause_score)) %>% rename(Codon = A_site)
-    Codon_pause_score_df_P_site <- Super_codonator_output %>% group_by(P_site) %>% summarise(Codon_pause_score_P_site = sum(Pause_score)) %>% rename(Codon = P_site)
-    Codon_pause_score_df_E_site <- Super_codonator_output %>% group_by(E_site) %>% summarise(Codon_pause_score_E_site = sum(Pause_score)) %>% rename(Codon = E_site)
+    Codon_pause_score_df_A_site <- Super_codonator_output_filtered %>% group_by(A_site) %>% summarise(Codon_pause_score_A_site = sum(Pause_score)) %>% rename(Codon = A_site)
+    Codon_pause_score_df_P_site <- Super_codonator_output_filtered %>% group_by(P_site) %>% summarise(Codon_pause_score_P_site = sum(Pause_score)) %>% rename(Codon = P_site)
+    Codon_pause_score_df_E_site <- Super_codonator_output_filtered %>% group_by(E_site) %>% summarise(Codon_pause_score_E_site = sum(Pause_score)) %>% rename(Codon = E_site)
     Codon_pause_score_df <- merge(Codon_pause_score_df_A_site, Codon_pause_score_df_E_site, by = "Codon") %>% merge(Codon_pause_score_df_P_site, by = "Codon")
-    Super_codonator_output_ORFs <- Super_codonator_output %>% drop_na(A_site)
-    Total_counts_ORFs <- sum(Super_codonator_output_ORFs$Norm_count)
+    Super_codonator_output_filtered_ORFs <- Super_codonator_output_filtered %>% drop_na(A_site)
+    Total_counts_ORFs <- sum(Super_codonator_output_filtered_ORFs$Norm_count)
     Codon_pause_score_df <- Codon_pause_score_df %>% mutate(Normalised_codon_pause_score_A_site = Codon_pause_score_df$Codon_pause_score_A_site/Total_counts_ORFs, 
                                                             Normalised_codon_pause_score_P_site = Codon_pause_score_df$Codon_pause_score_P_site/Total_counts_ORFs, 
                                                             Normalised_codon_pause_score_E_site = Codon_pause_score_df$Codon_pause_score_E_site/Total_counts_ORFs)
@@ -228,7 +228,7 @@ for (input_file in input_files) {
   Merged_normalised_codon_pause_score_and_usage <- merge(Codon_pause_score_df, Codon_usage_table, by = "Codon", all = TRUE) %>% select(-2,-3,-4)
   
   # Generate the output file path for the codon occupancy output
-  output_codon_occupancy <- file.path(output_folder, paste0(file_path_sans_ext(basename(input_file)), "_codon_occupancy_output.csv"))
+  output_codon_occupancy <- file.path(output_folder, paste0(file_path_sans_ext(basename(input_file)), "_cutoff_", filter_threshold, "_pause_score_usage_output.csv"))
   
   # Write the filtered data to the output file
   write.csv(Merged_normalised_codon_pause_score_and_usage, file = output_codon_occupancy, row.names = FALSE)
@@ -267,7 +267,7 @@ for (input_file in input_files) {
           panel.background = element_rect(linetype = "solid"))
   
   # Generate the output file path for the codon occupancy plot
-  output_file_codon_occupancy_plot <- file.path(output_folder, paste0(file_path_sans_ext(basename(input_file)), "_codon_occupancy_plot.svg"))
+  output_file_codon_occupancy_plot <- file.path(output_folder, paste0(file_path_sans_ext(basename(input_file)), "_cutoff_", filter_threshold, "_pause_score_usage_plot.svg"))
   
   # Set the desired width and height for the SVG plot
   plot_width <- 3.75  # Specify the width in pixels
