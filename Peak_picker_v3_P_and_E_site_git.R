@@ -1,5 +1,3 @@
-#github aagnolin https://github.com/aagnolin
-
 # Check if the user requests help or specifies the method
 if (length(commandArgs(trailingOnly = TRUE)) == 0 || any(commandArgs(trailingOnly = TRUE) %in% c("-h", "--help"))) {
   cat("Script Usage:\n")
@@ -88,7 +86,7 @@ for (input_file in input_files) {
   # Generate files with extracted pause codon for each peak
   cat("Extracting pause codon from input files...\n")
   
-  # Calculate the coding frame and extract the codons in the A (Pause), P and E sites 
+  # Perform the desired actions on the data
   Alt_predict_modulus <- alt_predict_input %>%
     mutate(modulus = offset %% 3) %>%
     mutate(modulus = ifelse(is.na(modulus), 5, modulus))
@@ -121,11 +119,6 @@ for (input_file in input_files) {
   Super_codonator_output <- bind_rows(output_NA, output_0, output_1, output_2) %>%
     arrange(position) %>%
     select(-modulus)
-  
-  #Calculate ribosome coverage per gene and Pause score, then add it as a new column
-  Super_codonator_output <- Super_codonator_output %>% group_by(gene) %>% mutate(Ribosome_coverage_per_gene = sum(count/gene_length))
-  Super_codonator_output <- Super_codonator_output %>% group_by(gene) %>% mutate(Pause_score = count/Ribosome_coverage_per_gene)
-  
   
   # Apply optional filtering if the filter_threshold is provided
   if (!is.na(filter_threshold)) {
@@ -173,54 +166,54 @@ for (input_file in input_files) {
       theme(axis.line = element_line(linetype = "solid")) + 
       theme(axis.line = element_line(linetype = "blank"),
             panel.grid.major = element_line(colour = "gray89",
-                                            linetype = "blank"),
+                                          linetype = "blank"),
             panel.grid.minor = element_line(linetype = "blank"),
             panel.background = element_rect(linetype = "solid")) + theme(axis.text.x = element_text(vjust = 0.5,
-                                                                                                    angle = 45))
-    
-    
-    # Generate the output file path for the plot
-    output_file_density_plot <- file.path(output_folder, paste0(file_path_sans_ext(basename(input_file)), "density_plot_cutoff.svg"))
-    
-    # Set the desired width and height for the SVG plot
-    plot_width <- 4.375  # Specify the width in pixels
-    plot_height <- 3.0208  # Specify the height in pixels
-    
-    # Export the plot as an SVG image with the specified size
-    svg(output_file_density_plot, width = plot_width, height = plot_height)
-    print(density_plot)
-    dev.off()
-    
-    message('Density plot of peaks with selected threshold has been generated')
+    angle = 45))
+      
+  
+  # Generate the output file path for the plot
+  output_file_density_plot <- file.path(output_folder, paste0(file_path_sans_ext(basename(input_file)), "_cutoff_", filter_threshold, "_density_plot.svg"))
+  
+  # Set the desired width and height for the SVG plot
+  plot_width <- 4.375  # Specify the width in pixels
+  plot_height <- 3.0208  # Specify the height in pixels
+  
+  # Export the plot as an SVG image with the specified size
+  svg(output_file_density_plot, width = plot_width, height = plot_height)
+  print(density_plot)
+  dev.off()
+  
+  message('Density plot of peaks with selected threshold has been generated')
   }
   
-  # Generate the output file path for the pause codon output
-  output_pause_codon <- file.path(output_folder, paste0(file_path_sans_ext(basename(input_file)), "_pause_codon_output.csv"))
+  # Generate the output file path for the pause codon output and codon occupancy output
+  output_pause_codon <- file.path(output_folder, paste0(file_path_sans_ext(basename(input_file)), "_cutoff_", filter_threshold, "_pause_codon_output.csv"))
   
   # Write the filtered data to the output file
-  write.csv(Super_codonator_output, file = output_pause_codon, row.names = FALSE)
-  
-  # Print a message indicating the completion
+  write.csv(Super_codonator_output_filtered, file = output_pause_codon, row.names = FALSE)
+ 
+   # Print a message indicating the completion
   cat("Processed file:", input_file, "\n")
   
   # Print a final completion message
   cat("Dataset successfully written to the output folder\n")
   
   # Read the Codon usage table
-  Codon_usage_table <- read_excel(codon_table)
+  Codon_usage_table_combined_ORF_file_Alberto <- read_excel(codon_table)
   
   # Calculate codon observations method "single" for Pause_codon
   if (method == "single") {
-    codon_observations_pause <- table(Super_codonator_output$Pause_codon)
-    codon_observations_P_site <- table(Super_codonator_output$P_site)
-    codon_observations_E_site <- table(Super_codonator_output$E_site)
+    codon_observations_pause <- table(Super_codonator_output_filtered$Pause_codon)
+    codon_observations_P_site <- table(Super_codonator_output_filtered$P_site)
+    codon_observations_E_site <- table(Super_codonator_output_filtered$E_site)
   }
   
   # Calculate codon observations method "cumulative" for Pause_codon
   if (method == "cumulative") {
-    codon_observations_pause <- table(rep(Super_codonator_output$Pause_codon, Super_codonator_output$count))
-    codon_observations_P_site <- table(rep(Super_codonator_output$P_site, Super_codonator_output$count))
-    codon_observations_E_site <- table(rep(Super_codonator_output$E_site, Super_codonator_output$count))
+    codon_observations_pause <- table(rep(Super_codonator_output_filtered$Pause_codon, Super_codonator_output_filtered$count))
+    codon_observations_P_site <- table(rep(Super_codonator_output_filtered$P_site, Super_codonator_output_filtered$count))
+    codon_observations_E_site <- table(rep(Super_codonator_output_filtered$E_site, Super_codonator_output_filtered$count))
   }
   
   # Calculate total number of entries for each site
@@ -253,12 +246,12 @@ for (input_file in input_files) {
   )
   
   # Merge occupancy data frames with usage data frame
-  Merged_occupancy_and_usage <- merge(codon_df_pause, Codon_usage_table, by = "Codon", all = TRUE)
+  Merged_occupancy_and_usage <- merge(codon_df_pause, Codon_usage_table_combined_ORF_file_Alberto, by = "Codon", all = TRUE)
   Merged_occupancy_and_usage <- merge(Merged_occupancy_and_usage, codon_df_P_site, by = "Codon", all = TRUE)
   Merged_occupancy_and_usage <- merge(Merged_occupancy_and_usage, codon_df_E_site, by = "Codon", all = TRUE)
   
   # Generate the output file path for the codon occupancy output
-  output_codon_occupancy <- file.path(output_folder, paste0(file_path_sans_ext(basename(input_file)), "_codon_occupancy_output.csv"))
+  output_codon_occupancy <- file.path(output_folder, paste0(file_path_sans_ext(basename(input_file)), "_cutoff_", filter_threshold, "_codon_occupancy_output.csv"))
   
   # Write the filtered data to the output file
   write.csv(Merged_occupancy_and_usage, file = output_codon_occupancy, row.names = FALSE)
@@ -294,7 +287,7 @@ for (input_file in input_files) {
           panel.background = element_rect(linetype = "solid"))
   
   # Generate the output file path for the codon occupancy plot
-  output_file_codon_occupancy_plot <- file.path(output_folder, paste0(file_path_sans_ext(basename(input_file)), "_codon_occupancy_plot.svg"))
+  output_file_codon_occupancy_plot <- file.path(output_folder, paste0(file_path_sans_ext(basename(input_file)), "_cutoff_", filter_threshold, "_codon_occupancy_plot.svg"))
   
   # Set the desired width and height for the SVG plot
   plot_width <- 3.75  # Specify the width in pixels
