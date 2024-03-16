@@ -5,7 +5,7 @@ library(tidyverse)
 
 #Names of samples in wells (necessary for later)
 ##Experiment 27/02/2024
-sample_name_mapping <- c("A1" = "WT",
+sample_name_mapping_27_02_2024 <- c("A1" = "WT",
                          "C1" = "WT",
                          "E1" = "WT",
                          "G1" = "WT", 
@@ -42,7 +42,7 @@ final_plate_reader_merged$IPTG[final_plate_reader_merged$Sample %in% c(paste0("C
 #-------------------------------------------------------
 
 ##Experiment 07/03/2024
-sample_name_mapping <- c("A1" = "clone 1",
+sample_name_mapping_07_03_2024 <- c("A1" = "clone 1",
                          "B1" = "clone 8",
                          "D1" = "clone 1",
                          "E1" = "clone 8", 
@@ -150,46 +150,20 @@ final_plate_reader_merged <- final_plate_reader_merged %>% drop_na() #Once you h
 
 #Give sample names to wells
 ## Define a vector to map old sample names to new ones
-sample_name_mapping <- c("A1" = "WT",
-                         "C1" = "WT",
-                         "E1" = "WT",
-                         "G1" = "WT", 
-                         "A3" = "clone 1",
-                         "C3" = "clone 1",
-                         "E3" = "clone 1",
-                         "G3" = "clone 1",
-                         "A5" = "clone 2",
-                         "C5" = "clone 2",
-                         "E5" = "clone 2",
-                         "G5" = "clone 2",
-                         "A7" = "clone 3",
-                         "C7" = "clone 3",
-                         "E7" = "clone 3",
-                         "G7" = "clone 3",
-                         "A9" = "clone 4",
-                         "C9" = "clone 4",
-                         "E9" = "clone 4",
-                         "G9" = "clone 4",
-                         "A11" = "clone 5",
-                         "C11" = "clone 5",
-                         "E11" = "clone 5",
-                         "G11" = "clone 5",
-                         "A12" = "- CTRL",
-                         "C12" = "- CTRL",
-                         "E12" = "- CTRL",
-                         "G12" = "- CTRL") #pass all the names based on the wells that have been used
+sample_name_mapping <- sample_name_mapping_27_02_2024
 
 ## Update the Sample column with the new names
 final_plate_reader_merged$Sample <- ifelse(final_plate_reader_merged$Sample %in% names(sample_name_mapping), 
                     sample_name_mapping[final_plate_reader_merged$Sample], 
                     final_plate_reader_merged$Sample)
 
-ggplot(data = filter(final_plate_reader_merged, Sample != "clone 1", Medium == "MM", IPTG == "1 mM"),
+ggplot(data = filter(final_plate_reader_merged, Sample != "clone 1" & Sample != "WT", Medium == "MM", IPTG == "1 mM"),
        mapping = aes(x = Time,
                      group = Sample)) +
   geom_point(aes(y = GFP_value, shape = Sample)) +
   geom_line(aes(y = GFP_value), col = 'limegreen') +
   geom_point(aes(y = OD_value*20000, shape = Sample)) +
   geom_line(aes(y = OD_value*20000), col = "black") +
-  scale_y_continuous(sec.axis = sec_axis(~./20000 , name = 'OD_value')) + 
+  scale_y_continuous(sec.axis = sec_axis(~./20000 , name = 'OD value')) +
+  labs(y = "GFP value") +
   theme_bw()
