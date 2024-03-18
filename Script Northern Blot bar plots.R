@@ -10,8 +10,8 @@ Merged_NB <- rbind(NB_quantification_2024_02_12, NB_quantification_2024_02_20, N
 data_NB <- Merged_NB
 
 
-#boxplot 13 and 20 duplo
-ggplot(data = filter(Merged_NB),
+#boxplot without BAA024
+ggplot(data = filter(Merged_NB, Name != "BAA024"),
        mapping = aes(x = Name,
                      y = Signal)) +
   geom_boxplot(fill = "grey", width = 0.5, linewidth = 1) +
