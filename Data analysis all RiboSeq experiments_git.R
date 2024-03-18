@@ -313,7 +313,7 @@ Mup_Avg <- read_csv("C:/Users/aagnoli/OneDrive - UvA/WP 1 - RiboSeq/Manuscript S
   )  
 #Normalize these averaged datasets
 riboseq_1 <- Mup_Avg
-riboseq_2 <- x2X_Spin_Avg
+riboseq_2 <- x1X_PEG_Spin_Avg
 
 sum(riboseq_1$Avg_Norm_reads)
 sum(riboseq_2$Avg_Norm_reads)
@@ -951,6 +951,11 @@ sum((Xfit_codon_floor^2)/sum(logData_codon_floor^2)*100)
 #Calculate the explained variance (as some kind of ‘quality’ measure.. 100=perfect fit)
 explained_variance_floor <- sum((Xfit_codon_floor^2)/sum(logData_codon_floor^2)*100)
 
+#Calculate the explained variance adjusted
+XfitMc <- scores_codon_floor[,1]%*%t(loads_codon_floor[,1])
+sum(XfitMc**2)/sum(mcX_codon_floor**2)*100
+
+adjusted_explained_variance_floor <- sum(XfitMc**2)/sum(mcX_codon_floor**2)*100
 # Extracting coefficients of the green line
 coefficients_tls_line_codon_floor <- coef(lm(Xfit_codon_floor[, 2] ~ Xfit_codon_floor[, 1] + 1))
 equation_codon_floor <- paste("y =", round(coefficients_tls_line_codon_floor[2], 2), "* x +", round(coefficients_tls_line_codon_floor[1], 2))
@@ -961,10 +966,10 @@ ggplot(data = as.data.frame(logData_codon_floor),
   geom_point(size = 1, alpha = 0.3) +
   geom_abline(intercept = coefficients_tls_line_codon_floor[1], slope = coefficients_tls_line_codon_floor[2], col = "darkgreen", linewidth = 1) +
   #geom_abline(intercept = 0, slope = 1, col = "red", lwd = 1) + #45 degrees line
-  annotate("text", x = 1, y = max(logData_codon_floor[, 2]), label = paste0("Explained variance = ", round(explained_variance_floor, 2), "%"), hjust = 0.05, vjust = 1, size = 4) +
+  annotate("text", x = 1, y = max(logData_codon_floor[, 2]), label = paste0("Explained variance = ", round(adjusted_explained_variance_floor, 2), "%"), hjust = 0.05, vjust = 1, size = 4) +
   theme_bw() +
-  labs(x = "Counts 2X Spin",
-       y = "Counts Sucrose") +
+  labs(x = "Counts Sucrose",
+       y = "Counts 1X PEG-Spin") +
   theme(plot.subtitle = element_text(face = "bold"),
         plot.caption = element_text(face = "bold"),
         axis.title = element_text(face = "bold"),
