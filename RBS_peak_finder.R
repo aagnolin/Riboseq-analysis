@@ -108,7 +108,7 @@ target_sequences <- gene_info_df %>% summarise(LocusTag = LocusTag, target_start
 target_sequences <- target_sequences %>% rename(locus_tag = "LocusTag")
 
 #select the input dataset
-input_data <- Normalized_ppGpp_8h_1_35_full
+input_data <- Normalized_212_8h_1_53_full
 input_data <- merge(input_data, target_sequences, by = "locus_tag", all = TRUE)
 
 #Sequences outside the ORFs do not have a locus tag assigned, but this is necessary if we want to analyse peaks in the upstream region of the ORFs
@@ -145,8 +145,11 @@ for (i in 1:nrow(input_data)) {
 
 
 #Filter highest peaks on target regions of each locus tag and calculate the position of those peaks relative to the 1st nt of the start codon
-input_data_max <- input_data %>% group_by(locus_tag) %>% filter(position >= target_start & position <= target_end, Norm_count == max(Norm_count))
+#Filtered_input_data <- input_data %>% filter(locus_tag == "BSU13280" | locus_tag == "BSU13280" | locus_tag == "BSU37350" | locus_tag == "BSU28860" | locus_tag == "BSU36660" | locus_tag == "BSU36650" | locus_tag == "BSU03780" | locus_tag == "BSU14180" | locus_tag == "BSU18060" | locus_tag == "BSU28290" | locus_tag == "BSU08760", position >= target_start & position <= target_end)
+input_data_max <- group_by(input_data, locus_tag) %>% filter(position >= target_start & position <= target_end, Norm_count == max(Norm_count))
 input_data_max <- mutate(input_data_max, relative_position_RBS_peak = target_end - position)
+
+
 
 #merge dataset with target sequences for motif search
 input_data_max <- merge(input_data_max, subseq_list, by = "locus_tag")
@@ -155,9 +158,8 @@ input_data_max <- merge(input_data_max, subseq_list, by = "locus_tag")
 ggplot(data = input_data_max,
        mapping = aes(x = relative_position_RBS_peak)) +
   geom_bar() +
-  scale_x_reverse(n.breaks = 18) +
-  scale_y_continuous(limits = c(0,155))
+  scale_x_reverse()
 
 #write list of sequences for the motif search in kplogo
-write_csv(WT_8h_target_seq_max, file = "C:/Users/aagnoli/Desktop/WT_8h_RBS.csv")
+write_csv(input_data_max, file = "C:/Users/aagnoli/Desktop/RBS_peak_finder_output_2.csv")
 
