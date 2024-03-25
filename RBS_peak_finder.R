@@ -79,37 +79,43 @@ Normalized_212_8h_2_35_full <- read_csv("C:/Users/aagnoli/OneDrive - UvA/RNA seq
 Normalized_ppGpp_8h_1_35_full <- read_csv("C:/Users/aagnoli/OneDrive - UvA/RNA sequencing data/Results 14-02-23 Yaozu ppGpp and codon exchange analysis/Results 14-02-23 Yaozu ppGpp and codon exchange analysis/ppGpp/Check RBS peak/Normalized_ppGpp_8h_1_35_full.csv")
 Normalized_ppGpp_8h_2_35_full <- read_csv("C:/Users/aagnoli/OneDrive - UvA/RNA sequencing data/Results 14-02-23 Yaozu ppGpp and codon exchange analysis/Results 14-02-23 Yaozu ppGpp and codon exchange analysis/ppGpp/Check RBS peak/Normalized_ppGpp_8h_2_35_full.csv")
 
-#-------------------------------------------------------------------------------
-#SEQUENCE FINDER
-#Initialize a list to store the subsequences
+# Identify target sequences containing RBSs using the gene_info_df from the script of all riboseq analyses. Takes strand directionality into consideration
+target_sequences <- gene_info_df %>%
+  mutate(target_start = ifelse(Strand == "+", StartPosition - 21, EndPosition - 14),  # Adjust for strand direction
+         target_end = ifelse(Strand == "+", StartPosition + 14, EndPosition + 21)) %>%
+  select(LocusTag, target_start, target_end)
+
+# SEQUENCE FINDER
+# Initialize a list to store the subsequences
 subseq_list <- list()
 
-#Iterate over each row of target_sequences
+# Iterate over each row of target_sequences
 for (i in 1:nrow(target_sequences)) {
   # Extract start and end positions for the ith row
   start_pos <- target_sequences[i, "target_start"]
   end_pos <- target_sequences[i, "target_end"]
   
-  #Extract subsequence from the genome
-  subseq_list[[i]] <- as.character(subseq(genome, start_pos, end_pos))
+  # Extract subsequence from the genome
+  if (gene_info_df$Strand[i] == "+") {
+    subseq_list[[i]] <- as.character(subseq(genome, start_pos, end_pos))
+  } else if (gene_info_df$Strand[i] == "-") {
+    subseq_list[[i]] <- as.character(reverseComplement(subseq(genome, start_pos, end_pos)))
+  } else {
+    # Handle unrecognized strand information
+    subseq_list[[i]] <- NA  # Or any other suitable handling
+  }
 }
 
-#Combine all subsequences into a single character vector or data frame
-subseq_list <- as.data.frame(unlist(subseq_list))
-subseq_list <- cbind(subseq_list, target_sequences$locus_tag)
-
-subseq_list <- subseq_list %>% rename(target_sequence = "unlist(subseq_list)", locus_tag = "target_sequences$locus_tag")
-
-
+# Combine all subsequences into a single data frame
+subseq_df <- data.frame(
+  target_sequence = unlist(subseq_list),
+  locus_tag = target_sequences$LocusTag
+)
 #-------------------------------------------------------------------------------
 #PEAK FINDER
-#Identify target sequences containing RBSs using the gene_info_df from the script of all riboseq analyses
-target_sequences <- gene_info_df %>% summarise(LocusTag = LocusTag, target_start = StartPosition -21, target_end = StartPosition) #a 21-nt sequence has been selected (last nt is the 1st nucleotide of the start codon)
-target_sequences <- target_sequences %>% rename(locus_tag = "LocusTag")
-
 #select the input dataset
-input_data <- Normalized_212_8h_1_53_full
-input_data <- merge(input_data, target_sequences, by = "locus_tag", all = TRUE)
+input_data <- Normalized_212_8h_1_53_full %>% dplyr::rename(LocusTag = "locus_tag")
+input_data <- merge(input_data, target_sequences, by = "LocusTag", all = TRUE)
 
 #Sequences outside the ORFs do not have a locus tag assigned, but this is necessary if we want to analyse peaks in the upstream region of the ORFs
 ##Sort target_sequences by target_start for binary search
@@ -124,7 +130,7 @@ assign_locus_tag <- function(position) {
     mid <- floor((left + right) / 2)
     
     if (position >= target_sequences_sorted[mid, "target_start"] && position <= target_sequences_sorted[mid, "target_end"]) {
-      return(target_sequences_sorted[mid, c("locus_tag", "target_start", "target_end")])
+      return(target_sequences_sorted[mid, c("LocusTag", "target_start", "target_end")])
     } else if (position < target_sequences_sorted[mid, "target_start"]) {
       right <- mid - 1
     } else {
@@ -137,13 +143,13 @@ assign_locus_tag <- function(position) {
 
 ##Assign locus_tag, target_start, and target_end for rows with NA locus_tag that are in the target position range
 for (i in 1:nrow(input_data)) {
-  if (is.na(input_data[i, "locus_tag"])) {
+  if (is.na(input_data[i, "LocusTag"])) {
     result <- assign_locus_tag(input_data[i, "position"])
-    input_data[i, c("locus_tag", "target_start", "target_end")] <- result
+    input_data[i, c("LocusTag", "target_start", "target_end")] <- result
   }
 }
 
-
+input_data <- input_data %>% dplyr::rename(locus_tag = "LocusTag")
 #Filter highest peaks on target regions of each locus tag and calculate the position of those peaks relative to the 1st nt of the start codon
 #Filtered_input_data <- input_data %>% filter(locus_tag == "BSU13280" | locus_tag == "BSU13280" | locus_tag == "BSU37350" | locus_tag == "BSU28860" | locus_tag == "BSU36660" | locus_tag == "BSU36650" | locus_tag == "BSU03780" | locus_tag == "BSU14180" | locus_tag == "BSU18060" | locus_tag == "BSU28290" | locus_tag == "BSU08760", position >= target_start & position <= target_end)
 input_data_max <- group_by(input_data, locus_tag) %>% filter(position >= target_start & position <= target_end, Norm_count == max(Norm_count))
@@ -152,7 +158,7 @@ input_data_max <- mutate(input_data_max, relative_position_RBS_peak = target_end
 
 
 #merge dataset with target sequences for motif search
-input_data_max <- merge(input_data_max, subseq_list, by = "locus_tag")
+input_data_max <- merge(input_data_max, subseq_df, by = "locus_tag")
 
 #plot results
 ggplot(data = input_data_max,
