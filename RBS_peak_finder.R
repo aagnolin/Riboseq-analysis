@@ -79,11 +79,20 @@ Normalized_212_8h_2_35_full <- read_csv("C:/Users/aagnoli/OneDrive - UvA/RNA seq
 Normalized_ppGpp_8h_1_35_full <- read_csv("C:/Users/aagnoli/OneDrive - UvA/RNA sequencing data/Results 14-02-23 Yaozu ppGpp and codon exchange analysis/Results 14-02-23 Yaozu ppGpp and codon exchange analysis/ppGpp/Check RBS peak/Normalized_ppGpp_8h_1_35_full.csv")
 Normalized_ppGpp_8h_2_35_full <- read_csv("C:/Users/aagnoli/OneDrive - UvA/RNA sequencing data/Results 14-02-23 Yaozu ppGpp and codon exchange analysis/Results 14-02-23 Yaozu ppGpp and codon exchange analysis/ppGpp/Check RBS peak/Normalized_ppGpp_8h_2_35_full.csv")
 
+#Mup data
+Normalized_filtered_2X_Spin_53_full_14 <- read_csv("C:/Users/aagnoli/OneDrive - UvA/mup RBS finder/Normalized_filtered_2X_Spin_53_full_14.csv")
+Normalized_filtered_2X_Spin_Jun_53_full_13 <- read_csv("C:/Users/aagnoli/OneDrive - UvA/mup RBS finder/Normalized_filtered_2X_Spin_Jun_53_full_13.csv")
+Normalized_filtered_2X_Spin_Jun_53_full_12 <- read_csv("C:/Users/aagnoli/OneDrive - UvA/mup RBS finder/Normalized_filtered_2X_Spin_Jun_53_full_12.csv")
+Normalized_filtered_2X_Spin_Jun_53_full_11 <- read_csv("C:/Users/aagnoli/OneDrive - UvA/mup RBS finder/Normalized_filtered_2X_Spin_Jun_53_full_11.csv")
+
+
 # Identify target sequences containing RBSs using the gene_info_df from the script of all riboseq analyses. Takes strand directionality into consideration
 target_sequences <- gene_info_df %>%
-  mutate(target_start = ifelse(Strand == "+", StartPosition - 21, EndPosition - 14),  # Adjust for strand direction
-         target_end = ifelse(Strand == "+", StartPosition + 14, EndPosition + 21)) %>%
+  mutate(target_start = ifelse(Strand == "+", StartPosition - 21, EndPosition + 21),  # Adjust for strand direction
+         target_end = ifelse(Strand == "+", StartPosition, EndPosition)) %>%
   select(LocusTag, target_start, target_end)
+
+#------------------------------------------------
 
 # SEQUENCE FINDER
 # Initialize a list to store the subsequences
@@ -95,16 +104,18 @@ for (i in 1:nrow(target_sequences)) {
   start_pos <- target_sequences[i, "target_start"]
   end_pos <- target_sequences[i, "target_end"]
   
+  # Extract locus tag
+  locus_tag <- target_sequences$LocusTag[i]
+  
   # Extract subsequence from the genome
-  if (gene_info_df$Strand[i] == "+") {
-    subseq_list[[i]] <- as.character(subseq(genome, start_pos, end_pos))
-  } else if (gene_info_df$Strand[i] == "-") {
-    subseq_list[[i]] <- as.character(reverseComplement(subseq(genome, start_pos, end_pos)))
-  } else {
-    # Handle unrecognized strand information
-    subseq_list[[i]] <- NA  # Or any other suitable handling
-  }
+  subseq_list[[i]] <- as.character(subseq(genome, start_pos, end_pos))
 }
+
+# Combine all subsequences into a single data frame
+subseq_df <- data.frame(
+  target_sequence = unlist(subseq_list),
+  locus_tag = target_sequences$LocusTag
+)
 
 # Combine all subsequences into a single data frame
 subseq_df <- data.frame(
