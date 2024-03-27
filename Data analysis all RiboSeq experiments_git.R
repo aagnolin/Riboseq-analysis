@@ -56,8 +56,8 @@ X160h_2_ribo<-read_csv(file = "C:/Users/aagnoli/OneDrive - UvA/Riboseq datasets 
 #-----------------------------------------------------
 
 #FIXATION CONDITIONS
-Cm_1 <- read_csv(file = "C:/Users/aagnoli/OneDrive - UvA/RNA sequencing data/Global analysis fixation conditions/Cm_1.csvPause_codon.csv")
-Cm_2 <- read_csv(file = "C:/Users/aagnoli/OneDrive - UvA/RNA sequencing data/Global analysis fixation conditions/Cm_2.csvPause_codon.csv")
+Cm_1 <- read_csv(file = "C:/Users/aagnoli/OneDrive - UvA/Riboseq datasets and plots/16h-1_Ribo_35_full.csv")
+Cm_2 <- read_csv(file = "C:/Users/aagnoli/OneDrive - UvA/Riboseq datasets and plots/16h-2_ribo_35_full.csv")
 dsp_1 <- read_csv(file = "C:/Users/aagnoli/OneDrive - UvA/RNA sequencing data/Global analysis fixation conditions/dsp_1.csv")
 dsp_2 <- read_csv(file = "C:/Users/aagnoli/OneDrive - UvA/RNA sequencing data/Global analysis fixation conditions/dsp_2.csv")
 dsp_form_1 <- read_csv(file = "C:/Users/aagnoli/OneDrive - UvA/RNA sequencing data/Global analysis fixation conditions/dsp+for_1.csv")
@@ -312,8 +312,8 @@ Mup_Avg <- read_csv("C:/Users/aagnoli/OneDrive - UvA/WP 1 - RiboSeq/Manuscript S
          -Norm_count.y
   )  
 #Normalize these averaged datasets
-riboseq_1 <- Mup_Avg
-riboseq_2 <- x1X_PEG_Spin_Avg
+riboseq_1 <- Tet_Avg
+riboseq_2 <- Cm_Avg
 
 sum(riboseq_1$Avg_Norm_reads)
 sum(riboseq_2$Avg_Norm_reads)
@@ -325,8 +325,8 @@ Normalized_riboseq_2 <- mutate(riboseq_2, Norm_count = riboseq_2$Avg_Norm_reads*
 #-----------------------------------------------------
 
 #Paste here the name of the 2 files to compare (set file with higher total number of sequences as riboseq_1 for normalization at later steps)
-riboseq_1 <- Mup_reference_filtered_SAM_35_full_rep1
-riboseq_2 <- Mup_reference_filtered_SAM_35_full_rep2
+riboseq_1 <- dsp_1
+riboseq_2 <- dsp_2
   
 #===========================
 #FURTHER CLEANING OF alt_predict DATASETS
@@ -334,8 +334,8 @@ riboseq_2 <- Mup_reference_filtered_SAM_35_full_rep2
 riboseq_1 <- filter(riboseq_1, !grepl("^BSU_", locus_tag))
 riboseq_2 <- filter(riboseq_2, !grepl("^BSU_", locus_tag))
 ##use these below if datasets do not have the locus_tag column
-riboseq_1 <- filter(riboseq_1, !grepl("^trn_", gene.x), gene.x != 'ssrA')
-riboseq_2 <- filter(riboseq_2, !grepl("^trn_", gene.x), gene.x != 'ssrA')
+riboseq_1 <- filter(riboseq_1, !grepl("-", gene), gene != 'ssrA', gene != "scr", gene != "rnpB")
+riboseq_2 <- filter(riboseq_2, !grepl("-", gene), gene != 'ssrA', gene != "scr", gene != "rnpB")
 #===========================
 
 #Check which dataset has the highest number of reads
@@ -783,6 +783,12 @@ sum((Xfit^2)/sum(logData^2)*100)
 #Calculate the explained variance (as some kind of ‘quality’ measure.. 100=perfect fit)
 explained_variance <- sum((Xfit^2)/sum(logData^2)*100)
 
+#Calculate the explained variance adjusted
+XfitMc <- scores[,1]%*%t(loads[,1])
+sum(XfitMc**2)/sum(mcX**2)*100
+
+adjusted_explained_variance <- sum(XfitMc**2)/sum(mcX_codon_floor**2)*100
+
 # Extracting coefficients of the green line
 coefficients_tls_line <- coef(lm(Xfit[, 2] ~ Xfit[, 1] + 1))
 equation <- paste("y =", round(coefficients_tls_line[2], 2), "* x +", round(coefficients_tls_line[1], 2))
@@ -791,13 +797,32 @@ ggplot(data = as.data.frame(logData),
        mapping = aes(x = V1,
                      y = V2)) +
   geom_point() +
-  geom_abline(intercept = coefficients_tls_line[1], slope = coefficients_tls_line[2], col = "green", linewidth = 1) +
-  geom_abline(intercept = 0, slope = 1, col = "red", lwd = 1) +
-  annotate("text", x = 1, y = max(logData[, 2]), label = paste("Green: ", equation), hjust = 1, vjust = 1, size = 4)
+  geom_abline(intercept = coefficients_tls_line[1], slope = coefficients_tls_line[2], col = "darkgreen", linewidth = 1) +
+  #geom_abline(intercept = 0, slope = 1, col = "red", lwd = 1) +
+  annotate("text", x = 1, y = max(logData[, 2]), label = paste0("Explained variance = ", round(adjusted_explained_variance, 2), "%"), hjust = 0.05, vjust = 1, size = 4) +
+  theme_bw() +
+  labs(x = "Counts Sucrose",
+       y = "Counts 1X PEG-Spin") +
+  theme(plot.subtitle = element_text(face = "bold"),
+        plot.caption = element_text(face = "bold"),
+        axis.title = element_text(face = "bold"),
+        plot.title = element_text(face = "bold"),
+        legend.title = element_text(face = "bold"),
+        legend.key = element_rect(linetype = "solid")) +
+  theme(axis.ticks = element_line(linewidth = 0.5)) + 
+  theme(panel.background = element_rect(fill = NA)) + 
+  theme(axis.line = element_line(linetype = "solid")) + 
+  theme(axis.line = element_line(linetype = "blank"), 
+        panel.grid.major = element_line(colour = "gray89",
+                                        linetype = "blank"),
+        panel.grid.minor = element_line(linetype = "blank"),
+        panel.background = element_rect(linetype = "solid"))
 
 Output_tls_nt_replicates <- as.data.frame(logData) %>% rename(Norm_count.x = V1, Norm_count.y = V2)
-Output_tls_nt_replicates <- cbind(Output_tls_nt_replicates, explained_variance, equation)
+Output_tls_nt_replicates <- cbind(Output_tls_nt_replicates, adjusted_explained_variance, equation)
 write.csv(Output_tls_nt_replicates, file = "C:/Users/aagnoli/OneDrive - UvA/WP 1 - RiboSeq/Manuscript Spin-PEG/Data peak comparisons with tls/.csv", row.names = F)
+
+
 ## 1) comparison scatter plots on codon level --> merge codons based on 0,+1,+2 positions (0,+1,+2 being the nucleotides in a codon) --> NOTE: This ONLY includes peaks inside ORFs
 
 Merged_same_position_codon <- merge(Normalized_riboseq_1, Normalized_riboseq_2, 'position') %>%  mutate(codon_position = ceiling(offset.x/3))
