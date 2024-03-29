@@ -56,8 +56,8 @@ X160h_2_ribo<-read_csv(file = "C:/Users/aagnoli/OneDrive - UvA/Riboseq datasets 
 #-----------------------------------------------------
 
 #FIXATION CONDITIONS
-Cm_1 <- read_csv(file = "C:/Users/aagnoli/OneDrive - UvA/Riboseq datasets and plots/16h-1_Ribo_35_full.csv")
-Cm_2 <- read_csv(file = "C:/Users/aagnoli/OneDrive - UvA/Riboseq datasets and plots/16h-2_ribo_35_full.csv")
+Cm_1 <- read_csv(file = "C:/Users/aagnoli/OneDrive - UvA/RNA sequencing data/Global analysis fixation conditions/Cm_1.csv")
+Cm_2 <- read_csv(file = "C:/Users/aagnoli/OneDrive - UvA/RNA sequencing data/Global analysis fixation conditions/Cm_2.csv")
 dsp_1 <- read_csv(file = "C:/Users/aagnoli/OneDrive - UvA/RNA sequencing data/Global analysis fixation conditions/dsp_1.csv")
 dsp_2 <- read_csv(file = "C:/Users/aagnoli/OneDrive - UvA/RNA sequencing data/Global analysis fixation conditions/dsp_2.csv")
 dsp_form_1 <- read_csv(file = "C:/Users/aagnoli/OneDrive - UvA/RNA sequencing data/Global analysis fixation conditions/dsp+for_1.csv")
@@ -71,6 +71,21 @@ No_treatment_2 <- read_csv(file = "C:/Users/aagnoli/OneDrive - UvA/RNA sequencin
 Tet_1 <- read_csv(file = "C:/Users/aagnoli/OneDrive - UvA/RNA sequencing data/Global analysis fixation conditions/Tet_1.csv")
 Tet_2 <- read_csv(file = "C:/Users/aagnoli/OneDrive - UvA/RNA sequencing data/Global analysis fixation conditions/Tet_2.csv")
 
+#normalized
+Cm_1 <- read_csv(file = "C:/Users/aagnoli/OneDrive - UvA/RNA sequencing data/Global analysis fixation conditions/Normalized_Cm_1.csv")
+Cm_2 <- read_csv(file = "C:/Users/aagnoli/OneDrive - UvA/RNA sequencing data/Global analysis fixation conditions/Normalized_Cm_2.csv")
+dsp_1 <- read_csv(file = "C:/Users/aagnoli/OneDrive - UvA/RNA sequencing data/Global analysis fixation conditions/Normalized_dsp_1.csv")
+dsp_2 <- read_csv(file = "C:/Users/aagnoli/OneDrive - UvA/RNA sequencing data/Global analysis fixation conditions/Normalized_dsp_2.csv")
+dsp_form_1 <- read_csv(file = "C:/Users/aagnoli/OneDrive - UvA/RNA sequencing data/Global analysis fixation conditions/Normalized_dsp_form_1.csv")
+dsp_form_2 <- read_csv(file = "C:/Users/aagnoli/OneDrive - UvA/RNA sequencing data/Global analysis fixation conditions/Normalized_dsp_form_2.csv")
+formaldehyde_1 <- read_csv(file = "C:/Users/aagnoli/OneDrive - UvA/RNA sequencing data/Global analysis fixation conditions/Normalized_formaldehyde_1.csv")
+formaldehyde_2 <- read_csv(file = "C:/Users/aagnoli/OneDrive - UvA/RNA sequencing data/Global analysis fixation conditions/Normalized_formaldehyde_2.csv")
+methanol_1 <- read_csv(file = "C:/Users/aagnoli/OneDrive - UvA/RNA sequencing data/Global analysis fixation conditions/Normalized_methanol_1.csv")
+methanol_2 <- read_csv(file = "C:/Users/aagnoli/OneDrive - UvA/RNA sequencing data/Global analysis fixation conditions/Normalized_methanol_2.csv")
+No_treatment_1 <- read_csv(file = "C:/Users/aagnoli/OneDrive - UvA/RNA sequencing data/Global analysis fixation conditions/Normalized_No_treatment_1.csv")
+No_treatment_2 <- read_csv(file = "C:/Users/aagnoli/OneDrive - UvA/RNA sequencing data/Global analysis fixation conditions/Normalized_No_treatment_2.csv")
+Tet_1 <- read_csv(file = "C:/Users/aagnoli/OneDrive - UvA/RNA sequencing data/Global analysis fixation conditions/Normalized_Tet_1.csv")
+Tet_2 <- read_csv(file = "C:/Users/aagnoli/OneDrive - UvA/RNA sequencing data/Global analysis fixation conditions/Normalized_Tet_2.csv")
 #-----------------------------------------------------
 
 #ppGpp (Chloramphenicol)
@@ -325,8 +340,8 @@ Normalized_riboseq_2 <- mutate(riboseq_2, Norm_count = riboseq_2$Avg_Norm_reads*
 #-----------------------------------------------------
 
 #Paste here the name of the 2 files to compare (set file with higher total number of sequences as riboseq_1 for normalization at later steps)
-riboseq_1 <- dsp_1
-riboseq_2 <- dsp_2
+riboseq_1 <- Cm_1
+riboseq_2 <- Cm_2
   
 #===========================
 #FURTHER CLEANING OF alt_predict DATASETS
@@ -334,8 +349,8 @@ riboseq_2 <- dsp_2
 riboseq_1 <- filter(riboseq_1, !grepl("^BSU_", locus_tag))
 riboseq_2 <- filter(riboseq_2, !grepl("^BSU_", locus_tag))
 ##use these below if datasets do not have the locus_tag column
-riboseq_1 <- filter(riboseq_1, !grepl("-", gene), gene != 'ssrA', gene != "scr", gene != "rnpB")
-riboseq_2 <- filter(riboseq_2, !grepl("-", gene), gene != 'ssrA', gene != "scr", gene != "rnpB")
+riboseq_1 <- filter(riboseq_1, is.na(gene) | !grepl("-", gene) & gene != 'ssrA' & gene != "scr" & gene != "rnpB")
+riboseq_2 <- filter(riboseq_2, is.na(gene) | !grepl("-", gene) & gene != 'ssrA' & gene != "scr" & gene != "rnpB")
 #===========================
 
 #Check which dataset has the highest number of reads
@@ -739,9 +754,9 @@ P2 <- barplot(names=Binned.data[which(Binned.data$gene == i2),"start"],
 
 ##comparison scatter plots on nt level --> NOTE: This includes peaks in the entire genome, inside and outside ORFs
 
-Merged_same_position <- merge(Normalized_riboseq_1, Normalized_riboseq_2, 'position')
+Merged_same_position <- merge(riboseq_1, riboseq_2, 'position')
 
-cutoff <- 10 #cutoff of number of reads per peak for plotting. Change if desired
+cutoff <- 1 #cutoff of number of reads per peak for plotting. Change if desired
 Merged_same_position_cutoff <- filter(Merged_same_position, Norm_count.x >= cutoff & Norm_count.y >= cutoff)
 
 #linear regression
