@@ -72,20 +72,20 @@ Tet_1 <- read_csv(file = "C:/Users/aagnoli/OneDrive - UvA/RNA sequencing data/Gl
 Tet_2 <- read_csv(file = "C:/Users/aagnoli/OneDrive - UvA/RNA sequencing data/Global analysis fixation conditions/Tet_2.csv")
 
 #normalized
-Cm_1 <- read_csv(file = "C:/Users/aagnoli/OneDrive - UvA/RNA sequencing data/Global analysis fixation conditions/Normalized_Cm_1.csv")
-Cm_2 <- read_csv(file = "C:/Users/aagnoli/OneDrive - UvA/RNA sequencing data/Global analysis fixation conditions/Normalized_Cm_2.csv")
-dsp_1 <- read_csv(file = "C:/Users/aagnoli/OneDrive - UvA/RNA sequencing data/Global analysis fixation conditions/Normalized_dsp_1.csv")
-dsp_2 <- read_csv(file = "C:/Users/aagnoli/OneDrive - UvA/RNA sequencing data/Global analysis fixation conditions/Normalized_dsp_2.csv")
-dsp_form_1 <- read_csv(file = "C:/Users/aagnoli/OneDrive - UvA/RNA sequencing data/Global analysis fixation conditions/Normalized_dsp_form_1.csv")
-dsp_form_2 <- read_csv(file = "C:/Users/aagnoli/OneDrive - UvA/RNA sequencing data/Global analysis fixation conditions/Normalized_dsp_form_2.csv")
-formaldehyde_1 <- read_csv(file = "C:/Users/aagnoli/OneDrive - UvA/RNA sequencing data/Global analysis fixation conditions/Normalized_formaldehyde_1.csv")
-formaldehyde_2 <- read_csv(file = "C:/Users/aagnoli/OneDrive - UvA/RNA sequencing data/Global analysis fixation conditions/Normalized_formaldehyde_2.csv")
-methanol_1 <- read_csv(file = "C:/Users/aagnoli/OneDrive - UvA/RNA sequencing data/Global analysis fixation conditions/Normalized_methanol_1.csv")
-methanol_2 <- read_csv(file = "C:/Users/aagnoli/OneDrive - UvA/RNA sequencing data/Global analysis fixation conditions/Normalized_methanol_2.csv")
-No_treatment_1 <- read_csv(file = "C:/Users/aagnoli/OneDrive - UvA/RNA sequencing data/Global analysis fixation conditions/Normalized_No_treatment_1.csv")
-No_treatment_2 <- read_csv(file = "C:/Users/aagnoli/OneDrive - UvA/RNA sequencing data/Global analysis fixation conditions/Normalized_No_treatment_2.csv")
-Tet_1 <- read_csv(file = "C:/Users/aagnoli/OneDrive - UvA/RNA sequencing data/Global analysis fixation conditions/Normalized_Tet_1.csv")
-Tet_2 <- read_csv(file = "C:/Users/aagnoli/OneDrive - UvA/RNA sequencing data/Global analysis fixation conditions/Normalized_Tet_2.csv")
+N_Cm_1 <- read_csv(file = "C:/Users/aagnoli/OneDrive - UvA/RNA sequencing data/Global analysis fixation conditions/Normalized_Cm_1.csv")
+N_Cm_2 <- read_csv(file = "C:/Users/aagnoli/OneDrive - UvA/RNA sequencing data/Global analysis fixation conditions/Normalized_Cm_2.csv")
+N_dsp_1 <- read_csv(file = "C:/Users/aagnoli/OneDrive - UvA/RNA sequencing data/Global analysis fixation conditions/Normalized_dsp_1.csv")
+N_dsp_2 <- read_csv(file = "C:/Users/aagnoli/OneDrive - UvA/RNA sequencing data/Global analysis fixation conditions/Normalized_dsp_2.csv")
+N_dsp_form_1 <- read_csv(file = "C:/Users/aagnoli/OneDrive - UvA/RNA sequencing data/Global analysis fixation conditions/Normalized_dsp_form_1.csv")
+N_dsp_form_2 <- read_csv(file = "C:/Users/aagnoli/OneDrive - UvA/RNA sequencing data/Global analysis fixation conditions/Normalized_dsp_form_2.csv")
+N_formaldehyde_1 <- read_csv(file = "C:/Users/aagnoli/OneDrive - UvA/RNA sequencing data/Global analysis fixation conditions/Normalized_formaldehyde_1.csv")
+N_formaldehyde_2 <- read_csv(file = "C:/Users/aagnoli/OneDrive - UvA/RNA sequencing data/Global analysis fixation conditions/Normalized_formaldehyde_2.csv")
+N_methanol_1 <- read_csv(file = "C:/Users/aagnoli/OneDrive - UvA/RNA sequencing data/Global analysis fixation conditions/Normalized_methanol_1.csv")
+N_methanol_2 <- read_csv(file = "C:/Users/aagnoli/OneDrive - UvA/RNA sequencing data/Global analysis fixation conditions/Normalized_methanol_2.csv")
+N_No_treatment_1 <- read_csv(file = "C:/Users/aagnoli/OneDrive - UvA/RNA sequencing data/Global analysis fixation conditions/Normalized_No_treatment_1.csv")
+N_No_treatment_2 <- read_csv(file = "C:/Users/aagnoli/OneDrive - UvA/RNA sequencing data/Global analysis fixation conditions/Normalized_No_treatment_2.csv")
+N_Tet_1 <- read_csv(file = "C:/Users/aagnoli/OneDrive - UvA/RNA sequencing data/Global analysis fixation conditions/Normalized_Tet_1.csv")
+N_Tet_2 <- read_csv(file = "C:/Users/aagnoli/OneDrive - UvA/RNA sequencing data/Global analysis fixation conditions/Normalized_Tet_2.csv")
 #-----------------------------------------------------
 
 #ppGpp (Chloramphenicol)
@@ -340,8 +340,8 @@ Normalized_riboseq_2 <- mutate(riboseq_2, Norm_count = riboseq_2$Avg_Norm_reads*
 #-----------------------------------------------------
 
 #Paste here the name of the 2 files to compare (set file with higher total number of sequences as riboseq_1 for normalization at later steps)
-riboseq_1 <- Cm_1
-riboseq_2 <- Cm_2
+riboseq_1 <- N_Cm_1
+riboseq_2 <- N_Cm_2
   
 #===========================
 #FURTHER CLEANING OF alt_predict DATASETS
@@ -775,7 +775,7 @@ summary(linear_model_merged_same_position)$r.squared
 
 cor(Merged_same_position_cutoff$Norm_count.x, Merged_same_position_cutoff$Norm_count.y, method = "pearson")
 
-write_csv(Merged_same_position_cutoff, file = "C:/Users/aagnoli/OneDrive - UvA/WP 1 - RiboSeq/Manuscript Spin-PEG/Data peak comparisons with tls/Avg_Mup_1_and_2.csv")
+write_csv(Merged_same_position_cutoff, file = "C:/Users/aagnoli/OneDrive - UvA/RNA sequencing data/Global analysis fixation conditions/Cm1_Cm2_same_nt_position.csv")
 
 #total least squares regression (mean centered data)
 
@@ -802,7 +802,7 @@ explained_variance <- sum((Xfit^2)/sum(logData^2)*100)
 XfitMc <- scores[,1]%*%t(loads[,1])
 sum(XfitMc**2)/sum(mcX**2)*100
 
-adjusted_explained_variance <- sum(XfitMc**2)/sum(mcX_codon_floor**2)*100
+adjusted_explained_variance <- sum(XfitMc**2)/sum(mcX**2)*100
 
 # Extracting coefficients of the green line
 coefficients_tls_line <- coef(lm(Xfit[, 2] ~ Xfit[, 1] + 1))
