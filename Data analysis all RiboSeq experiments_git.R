@@ -71,7 +71,23 @@ No_treatment_2 <- read_csv(file = "C:/Users/aagnoli/OneDrive - UvA/RNA sequencin
 Tet_1 <- read_csv(file = "C:/Users/aagnoli/OneDrive - UvA/RNA sequencing data/Global analysis fixation conditions/Tet_1.csv")
 Tet_2 <- read_csv(file = "C:/Users/aagnoli/OneDrive - UvA/RNA sequencing data/Global analysis fixation conditions/Tet_2.csv")
 
-#normalized
+#normalized with script (only ORFs)
+N_Cm_1 <- read_csv(file = "C:/Users/aagnoli/OneDrive - UvA/RNA sequencing data/Global analysis fixation conditions/Normalized only ORFs script, no intergenetic/Normalized_Cm_1.csv")
+N_Cm_2 <- read_csv(file = "C:/Users/aagnoli/OneDrive - UvA/RNA sequencing data/Global analysis fixation conditions/Normalized only ORFs script, no intergenetic/Normalized_Cm_2.csv")
+N_dsp_1 <- read_csv(file = "C:/Users/aagnoli/OneDrive - UvA/RNA sequencing data/Global analysis fixation conditions/Normalized only ORFs script, no intergenetic/Normalized_dsp_1.csv")
+N_dsp_2 <- read_csv(file = "C:/Users/aagnoli/OneDrive - UvA/RNA sequencing data/Global analysis fixation conditions/Normalized only ORFs script, no intergenetic/Normalized_dsp_2.csv")
+N_dsp_form_1 <- read_csv(file = "C:/Users/aagnoli/OneDrive - UvA/RNA sequencing data/Global analysis fixation conditions/Normalized only ORFs script, no intergenetic/Normalized_dsp_form_1.csv")
+N_dsp_form_2 <- read_csv(file = "C:/Users/aagnoli/OneDrive - UvA/RNA sequencing data/Global analysis fixation conditions/Normalized only ORFs script, no intergenetic/Normalized_dsp_form_2.csv")
+N_formaldehyde_1 <- read_csv(file = "C:/Users/aagnoli/OneDrive - UvA/RNA sequencing data/Global analysis fixation conditions/Normalized only ORFs script, no intergenetic/Normalized_for_1.csv")
+N_formaldehyde_2 <- read_csv(file = "C:/Users/aagnoli/OneDrive - UvA/RNA sequencing data/Global analysis fixation conditions/Normalized only ORFs script, no intergenetic/Normalized_for_2.csv")
+N_methanol_1 <- read_csv(file = "C:/Users/aagnoli/OneDrive - UvA/RNA sequencing data/Global analysis fixation conditions/Normalized only ORFs script, no intergenetic/Normalized_meth_1.csv")
+N_methanol_2 <- read_csv(file = "C:/Users/aagnoli/OneDrive - UvA/RNA sequencing data/Global analysis fixation conditions/Normalized only ORFs script, no intergenetic/Normalized_meth_2.csv")
+N_No_treatment_1 <- read_csv(file = "C:/Users/aagnoli/OneDrive - UvA/RNA sequencing data/Global analysis fixation conditions/Normalized only ORFs script, no intergenetic/Normalized_No_1.csv")
+N_No_treatment_2 <- read_csv(file = "C:/Users/aagnoli/OneDrive - UvA/RNA sequencing data/Global analysis fixation conditions/Normalized only ORFs script, no intergenetic/Normalized_No_2.csv")
+N_Tet_1 <- read_csv(file = "C:/Users/aagnoli/OneDrive - UvA/RNA sequencing data/Global analysis fixation conditions/Normalized only ORFs script, no intergenetic/Normalized_Tet_1.csv")
+N_Tet_2 <- read_csv(file = "C:/Users/aagnoli/OneDrive - UvA/RNA sequencing data/Global analysis fixation conditions/Normalized only ORFs script, no intergenetic/Normalized_Tet_2.csv")
+
+#normalized manually (ORFs-normalized but also intergenic regions)
 N_Cm_1 <- read_csv(file = "C:/Users/aagnoli/OneDrive - UvA/RNA sequencing data/Global analysis fixation conditions/Normalized_Cm_1.csv")
 N_Cm_2 <- read_csv(file = "C:/Users/aagnoli/OneDrive - UvA/RNA sequencing data/Global analysis fixation conditions/Normalized_Cm_2.csv")
 N_dsp_1 <- read_csv(file = "C:/Users/aagnoli/OneDrive - UvA/RNA sequencing data/Global analysis fixation conditions/Normalized_dsp_1.csv")
@@ -99,22 +115,7 @@ ppGpp_16h_1_35_full <- read_csv("C:/Users/aagnoli/OneDrive - UvA/RNA sequencing 
 ppGpp_16h_2_35_full <- read_csv("C:/Users/aagnoli/OneDrive - UvA/RNA sequencing data/Results 14-02-23 Yaozu ppGpp and codon exchange analysis/Results 14-02-23 Yaozu ppGpp and codon exchange analysis/ppGpp/ppGpp_16h_2_35_full.csv")
 
 ##Merged replicates
-Cm_Avg <- read_csv("C:/Users/aagnoli/OneDrive - UvA/RNA sequencing data/Global analysis fixation conditions/Results/Merged by nucleotide position/Replicates nucleotide/Cm_1_and_2_nucleotide.csv") %>% 
-  mutate(Avg_Norm_reads = (Norm_count.x + Norm_count.y)/2) %>%
-  select(-genome.y,
-         -strand.y,
-         -gene.y,
-         -gene_length.y,
-         -offset.y,
-         -in_orf_90.y,
-         -count.y,
-         -sequence.y,
-         -Pause_codon.x,
-         -Pause_codon.y,
-         -Norm_count.x,
-         -Norm_count.y
-  )
-Tet_Avg <- read_csv("C:/Users/aagnoli/OneDrive - UvA/RNA sequencing data/Global analysis fixation conditions/Results/Merged by nucleotide position/Replicates nucleotide/Tet_1_and_2_nucleotide.csv") %>% 
+Cm_Avg <- read_csv("C:/Users/aagnoli/OneDrive - UvA/RNA sequencing data/Global analysis fixation conditions/Normalized only ORFs script, no intergenetic/Merged replicates same nt/Cm1_Cm2_same_nt.csv") %>% 
   mutate(Avg_Norm_reads = (Norm_count.x + Norm_count.y)/2) %>%
   select(-genome.y,
          -strand.y,
@@ -127,7 +128,20 @@ Tet_Avg <- read_csv("C:/Users/aagnoli/OneDrive - UvA/RNA sequencing data/Global 
          -Norm_count.x,
          -Norm_count.y
   )
-dsp_Avg <- read_csv("C:/Users/aagnoli/OneDrive - UvA/RNA sequencing data/Global analysis fixation conditions/Results/Merged by nucleotide position/Replicates nucleotide/dsp_1_and_2_nucleotide.csv") %>% 
+Tet_Avg <- read_csv("C:/Users/aagnoli/OneDrive - UvA/RNA sequencing data/Global analysis fixation conditions/Normalized only ORFs script, no intergenetic/Merged replicates same nt/Tet1_Tet2_same_nt.csv") %>% 
+  mutate(Avg_Norm_reads = (Norm_count.x + Norm_count.y)/2) %>%
+  select(-genome.y,
+         -strand.y,
+         -gene.y,
+         -gene_length.y,
+         -offset.y,
+         -in_orf_90.y,
+         -count.y,
+         -sequence.y,
+         -Norm_count.x,
+         -Norm_count.y
+  )
+dsp_Avg <- read_csv("C:/Users/aagnoli/OneDrive - UvA/RNA sequencing data/Global analysis fixation conditions/Normalized only ORFs script, no intergenetic/Merged replicates same nt/dsp1_dsp2_same_nt.csv") %>% 
   mutate(Avg_Norm_reads = (Norm_count.x + Norm_count.y)/2) %>%
   select(-genome.y,
          -strand.y,
@@ -142,7 +156,7 @@ dsp_Avg <- read_csv("C:/Users/aagnoli/OneDrive - UvA/RNA sequencing data/Global 
          -Norm_count.y
   )
 
-dsp_form_Avg <- read_csv("C:/Users/aagnoli/OneDrive - UvA/RNA sequencing data/Global analysis fixation conditions/Results/Merged by nucleotide position/Replicates nucleotide/dsp+form_1_and_2_nucleotide.csv") %>% 
+dsp_form_Avg <- read_csv("C:/Users/aagnoli/OneDrive - UvA/RNA sequencing data/Global analysis fixation conditions/Normalized only ORFs script, no intergenetic/Merged replicates same nt/dsp_form1_dsp_form2_same_nt.csv") %>% 
   mutate(Avg_Norm_reads = (Norm_count.x + Norm_count.y)/2) %>%
   select(-genome.y,
          -strand.y,
@@ -157,7 +171,7 @@ dsp_form_Avg <- read_csv("C:/Users/aagnoli/OneDrive - UvA/RNA sequencing data/Gl
          -Norm_count.y
   )
 
-form_Avg <- read_csv("C:/Users/aagnoli/OneDrive - UvA/RNA sequencing data/Global analysis fixation conditions/Results/Merged by nucleotide position/Replicates nucleotide/formaldehyde_1_and_2_nucleotide.csv") %>% 
+form_Avg <- read_csv("C:/Users/aagnoli/OneDrive - UvA/RNA sequencing data/Global analysis fixation conditions/Normalized only ORFs script, no intergenetic/Merged replicates same nt/formaldehyde1_formaldehyde2_same_nt.csv") %>% 
   mutate(Avg_Norm_reads = (Norm_count.x + Norm_count.y)/2) %>%
   select(-genome.y,
          -strand.y,
@@ -172,7 +186,7 @@ form_Avg <- read_csv("C:/Users/aagnoli/OneDrive - UvA/RNA sequencing data/Global
          -Norm_count.y
   )
 
-methanol_Avg <- read_csv("C:/Users/aagnoli/OneDrive - UvA/RNA sequencing data/Global analysis fixation conditions/Results/Merged by nucleotide position/Replicates nucleotide/methanol_1_and_2_nucleotide.csv") %>% 
+methanol_Avg <- read_csv("C:/Users/aagnoli/OneDrive - UvA/RNA sequencing data/Global analysis fixation conditions/Normalized only ORFs script, no intergenetic/Merged replicates same nt/methanol1_methanol2_same_nt.csv") %>% 
   mutate(Avg_Norm_reads = (Norm_count.x + Norm_count.y)/2) %>%
   select(-genome.y,
          -strand.y,
@@ -187,7 +201,7 @@ methanol_Avg <- read_csv("C:/Users/aagnoli/OneDrive - UvA/RNA sequencing data/Gl
          -Norm_count.y
   )
 
-No_treatment_Avg <- read_csv("C:/Users/aagnoli/OneDrive - UvA/RNA sequencing data/Global analysis fixation conditions/Results/Merged by nucleotide position/Replicates nucleotide/No_treatment_1_and_2_nucleotide.csv") %>% 
+No_treatment_Avg <- read_csv("C:/Users/aagnoli/OneDrive - UvA/RNA sequencing data/Global analysis fixation conditions/Normalized only ORFs script, no intergenetic/Merged replicates same nt/NoTreatment1_NoTreatment2_same_nt.csv") %>% 
   mutate(Avg_Norm_reads = (Norm_count.x + Norm_count.y)/2) %>%
   select(-genome.y,
          -strand.y,
@@ -327,8 +341,8 @@ Mup_Avg <- read_csv("C:/Users/aagnoli/OneDrive - UvA/WP 1 - RiboSeq/Manuscript S
          -Norm_count.y
   )  
 #Normalize these averaged datasets
-riboseq_1 <- Tet_Avg
-riboseq_2 <- Cm_Avg
+riboseq_1 <- 
+riboseq_2 <- 
 
 sum(riboseq_1$Avg_Norm_reads)
 sum(riboseq_2$Avg_Norm_reads)
@@ -340,9 +354,9 @@ Normalized_riboseq_2 <- mutate(riboseq_2, Norm_count = riboseq_2$Avg_Norm_reads*
 #-----------------------------------------------------
 
 #Paste here the name of the 2 files to compare (set file with higher total number of sequences as riboseq_1 for normalization at later steps)
-riboseq_1 <- N_Cm_1
-riboseq_2 <- N_Cm_2
-  
+riboseq_1 <- form_Avg
+riboseq_2 <- dsp_form_Avg
+
 #===========================
 #FURTHER CLEANING OF alt_predict DATASETS
 ##some tRNAs and rRNAs still remain in the tables after removal with bowtie2. Moreover, small RNAs like ssrA are not removed with Bowtie2.
@@ -757,13 +771,13 @@ P2 <- barplot(names=Binned.data[which(Binned.data$gene == i2),"start"],
 Merged_same_position <- merge(riboseq_1, riboseq_2, 'position')
 
 cutoff <- 1 #cutoff of number of reads per peak for plotting. Change if desired
-Merged_same_position_cutoff <- filter(Merged_same_position, Norm_count.x >= cutoff & Norm_count.y >= cutoff)
+Merged_same_position_cutoff <- filter(Merged_same_position, Avg_Norm_reads.x >= cutoff & Avg_Norm_reads.y >= cutoff)
 
 #linear regression
 
 ggplot(data = Merged_same_position_cutoff,
-       mapping = aes(x = Norm_count.x,
-                     y = Norm_count.y)) +
+       mapping = aes(x = Avg_Norm_reads.x,
+                     y = Avg_Norm_reads.y)) +
   geom_point() +
   scale_x_continuous(trans = "log10") +
   scale_y_continuous(trans = "log10") +
@@ -775,11 +789,10 @@ summary(linear_model_merged_same_position)$r.squared
 
 cor(Merged_same_position_cutoff$Norm_count.x, Merged_same_position_cutoff$Norm_count.y, method = "pearson")
 
-write_csv(Merged_same_position_cutoff, file = "C:/Users/aagnoli/OneDrive - UvA/RNA sequencing data/Global analysis fixation conditions/Cm1_Cm2_same_nt_position.csv")
+write_csv(Merged_same_position_cutoff, file = "C:/Users/aagnoli/OneDrive - UvA/RNA sequencing data/Global analysis fixation conditions/Normalized only ORFs script, no intergenetic/Merged replicates same nt/Tet1_Tet2_same_nt.csv")
 
 #total least squares regression (mean centered data)
-
-data = cbind(Merged_same_position_cutoff$Norm_count.x, Merged_same_position_cutoff$Norm_count.y)
+data = cbind(Merged_same_position_cutoff$Avg_Norm_reads.x, Merged_same_position_cutoff$Avg_Norm_reads.y)
 logData = log10(data)
 meanX = colMeans(logData)
 mcX = sweep(logData,2,meanX,FUN="-")
@@ -833,9 +846,9 @@ ggplot(data = as.data.frame(logData),
         panel.grid.minor = element_line(linetype = "blank"),
         panel.background = element_rect(linetype = "solid"))
 
-Output_tls_nt_replicates <- as.data.frame(logData) %>% rename(Norm_count.x = V1, Norm_count.y = V2)
+Output_tls_nt_replicates <- as.data.frame(logData) %>% rename(Avg_Norm_counts.x = V1, Avg_Norm_counts.y = V2)
 Output_tls_nt_replicates <- cbind(Output_tls_nt_replicates, adjusted_explained_variance, equation)
-write.csv(Output_tls_nt_replicates, file = "C:/Users/aagnoli/OneDrive - UvA/WP 1 - RiboSeq/Manuscript Spin-PEG/Data peak comparisons with tls/.csv", row.names = F)
+write.csv(Output_tls_nt_replicates, file = "C:/Users/aagnoli/OneDrive - UvA/RNA sequencing data/Global analysis fixation conditions/Normalized only ORFs script, no intergenetic/Merged replicates same nt/tls_same_nt/dsp_avg_vs_NoTreatment_avg_tls.csv", row.names = F)
 
 
 ## 1) comparison scatter plots on codon level --> merge codons based on 0,+1,+2 positions (0,+1,+2 being the nucleotides in a codon) --> NOTE: This ONLY includes peaks inside ORFs
