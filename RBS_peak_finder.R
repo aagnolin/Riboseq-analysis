@@ -66,6 +66,46 @@ gene_info_df <- data.frame(
   Strand = unlist(strands)
 )
 
+# Identify target sequences based on position values. Takes strand directionality into consideration
+target_sequences <- gene_info_df %>%
+  mutate(target_start = ifelse(Strand == "+", StartPosition - 30, EndPosition - 2),  #Write the numbers of the positions to select the range for sequence extraction
+         target_end = ifelse(Strand == "+", StartPosition + 2, EndPosition + 30)) %>%
+  select(LocusTag, target_start, target_end)
+
+#------------------------------------------------
+
+# SEQUENCE FINDER
+# Initialize a list to store the subsequences
+subseq_list <- list()
+
+# Iterate over each row of target_sequences
+for (i in 1:nrow(target_sequences)) {
+  # Extract start and end positions for the ith row
+  start_pos <- target_sequences[i, "target_start"]
+  end_pos <- target_sequences[i, "target_end"]
+  
+  # Extract locus tag
+  locus_tag <- target_sequences$LocusTag[i]
+  
+  # Extract subsequence from the genome
+  if (gene_info_df$Strand[i] == "+") {
+    subseq_list[[i]] <- as.character(subseq(genome, start_pos, end_pos))
+  } else if (gene_info_df$Strand[i] == "-") {
+    subseq_list[[i]] <- as.character(reverseComplement(subseq(genome, start_pos, end_pos)))
+  } else {
+    subseq_list[[i]] <- ""
+  }
+}
+
+# Combine all subsequences into a single data frame
+subseq_df <- data.frame(
+  target_sequence = unlist(subseq_list),
+  locus_tag = target_sequences$LocusTag
+)
+
+#-------------------------------------------------------------------------------
+
+#PEAK FINDER
 
 #load input files (ppGpp data, 8h)
 ##5-3'
@@ -85,64 +125,31 @@ Normalized_filtered_2X_Spin_Jun_53_full_13 <- read_csv("C:/Users/aagnoli/OneDriv
 Normalized_filtered_2X_Spin_Jun_53_full_12 <- read_csv("C:/Users/aagnoli/OneDrive - UvA/mup RBS finder/Normalized_filtered_2X_Spin_Jun_53_full_12.csv")
 Normalized_filtered_2X_Spin_Jun_53_full_11 <- read_csv("C:/Users/aagnoli/OneDrive - UvA/mup RBS finder/Normalized_filtered_2X_Spin_Jun_53_full_11.csv")
 
-
-# Identify target sequences containing RBSs using the gene_info_df from the script of all riboseq analyses. Takes strand directionality into consideration
-target_sequences <- gene_info_df %>%
-  mutate(target_start = ifelse(Strand == "+", StartPosition - 21, EndPosition + 21),  # Adjust for strand direction
+#Choose target positions (works in the same way as Sequence Finder. Takes strand directionality into consideration
+target_sequences_PeakFinder <- gene_info_df %>%
+  mutate(target_start = ifelse(Strand == "+", StartPosition - 30, EndPosition + 30),  #Write the numbers of the positions to select the range for sequence extraction
          target_end = ifelse(Strand == "+", StartPosition, EndPosition)) %>%
   select(LocusTag, target_start, target_end)
 
-#------------------------------------------------
-
-# SEQUENCE FINDER
-# Initialize a list to store the subsequences
-subseq_list <- list()
-
-# Iterate over each row of target_sequences
-for (i in 1:nrow(target_sequences)) {
-  # Extract start and end positions for the ith row
-  start_pos <- target_sequences[i, "target_start"]
-  end_pos <- target_sequences[i, "target_end"]
-  
-  # Extract locus tag
-  locus_tag <- target_sequences$LocusTag[i]
-  
-  # Extract subsequence from the genome
-  subseq_list[[i]] <- as.character(subseq(genome, start_pos, end_pos))
-}
-
-# Combine all subsequences into a single data frame
-subseq_df <- data.frame(
-  target_sequence = unlist(subseq_list),
-  locus_tag = target_sequences$LocusTag
-)
-
-# Combine all subsequences into a single data frame
-subseq_df <- data.frame(
-  target_sequence = unlist(subseq_list),
-  locus_tag = target_sequences$LocusTag
-)
-#-------------------------------------------------------------------------------
-#PEAK FINDER
-#select the input dataset
+#select the input dataset from the ones loaded
 input_data <- Normalized_212_8h_1_53_full %>% dplyr::rename(LocusTag = "locus_tag")
-input_data <- merge(input_data, target_sequences, by = "LocusTag", all = TRUE)
+input_data <- merge(input_data, target_sequences_PeakFinder, by = "LocusTag", all = TRUE)
 
 #Sequences outside the ORFs do not have a locus tag assigned, but this is necessary if we want to analyse peaks in the upstream region of the ORFs
-##Sort target_sequences by target_start for binary search
-target_sequences_sorted <- target_sequences[order(target_sequences$target_start), ]
+##Sort target_sequences_PeakFinder by target_start for binary search
+target_sequences_PeakFinder_sorted <- target_sequences_PeakFinder[order(target_sequences_PeakFinder$target_start), ]
 
 ##Binary search to assign locus_tag based on position
 assign_locus_tag <- function(position) {
   left <- 1
-  right <- nrow(target_sequences_sorted)
+  right <- nrow(target_sequences_PeakFinder_sorted)
   
   while (left <= right) {
     mid <- floor((left + right) / 2)
     
-    if (position >= target_sequences_sorted[mid, "target_start"] && position <= target_sequences_sorted[mid, "target_end"]) {
-      return(target_sequences_sorted[mid, c("LocusTag", "target_start", "target_end")])
-    } else if (position < target_sequences_sorted[mid, "target_start"]) {
+    if (position >= target_sequences_PeakFinder_sorted[mid, "target_start"] && position <= target_sequences_PeakFinder_sorted[mid, "target_end"]) {
+      return(target_sequences_PeakFinder_sorted[mid, c("LocusTag", "target_start", "target_end")])
+    } else if (position < target_sequences_PeakFinder_sorted[mid, "target_start"]) {
       right <- mid - 1
     } else {
       left <- mid + 1
