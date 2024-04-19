@@ -143,6 +143,13 @@ target_sequences_PeakFinder <- gene_info_df %>%
   mutate(target_start = ifelse(Strand == "+", StartPosition + 5, EndPosition - 5),  #Write the numbers of the positions to select the range for sequence extraction (-15 +15)
          target_end = ifelse(Strand == "+", EndPosition, StartPosition)) %>% #I checked the + and - signs and this looks correct (+5 +5)
   select(LocusTag, target_start, target_end)
+
+###CUSTOM
+target_sequences_PeakFinder <- gene_info_df %>%
+  mutate(target_start = ifelse(Strand == "+", StartPosition - 20, EndPosition + 20),  #Write the numbers of the positions to select the range for sequence extraction (-15 +15)
+         target_end = ifelse(Strand == "+", StartPosition + 40, EndPosition + 40)) %>% #I checked the + and - signs and this looks correct (+5 +5)
+  select(LocusTag, target_start, target_end)
+
 #-------------
 
 #select the input dataset from the ones loaded
@@ -185,7 +192,7 @@ input_data <- input_data %>% dplyr::rename(locus_tag = "LocusTag")
 #Filter highest peaks on target regions of each locus tag and calculate the position of those peaks relative to the 1st nt of the start codon
 #Filtered_input_data <- input_data %>% filter(locus_tag == "BSU13280" | locus_tag == "BSU13280" | locus_tag == "BSU37350" | locus_tag == "BSU28860" | locus_tag == "BSU36660" | locus_tag == "BSU36650" | locus_tag == "BSU03780" | locus_tag == "BSU14180" | locus_tag == "BSU18060" | locus_tag == "BSU28290" | locus_tag == "BSU08760", position >= target_start & position <= target_end)
 input_data_max <- group_by(input_data, locus_tag) %>% filter(position >= target_start & position <= target_end)
-input_data_max <- mutate(input_data_max, relative_position_RBS_peak = target_end - position)
+input_data_max <- mutate(input_data_max, relative_position_RBS_peak = (target_end - position)*-1)
 
 
 
@@ -201,9 +208,11 @@ input_data_max <- merge(input_data_max, gene_info_df, by = "locus_tag", all = TR
 ggplot(data = input_data_max,
        mapping = aes(x = relative_position_RBS_peak)) +
   geom_bar() +
-  scale_x_reverse(breaks = seq(0,55, by = 1)) + theme(axis.text.x = element_text(vjust = 0.5,
+  scale_x_continuous(breaks = c(seq(-20,0, by = 1), seq(1, 40, by = 1))) + theme(axis.text.x = element_text(vjust = 0.5,
     angle = 45))
 
+#Export table to make CDS plots (if using CUSTOM target sequences)
+write.csv(input_data_max, "C:/Users/aagnoli/Desktop/ppGpp_16h_CDS_plot_data.csv", row.names = FALSE) 
 
 #sum Norm_count in target positions for each gene, then divide by the target sequence length
 df_Ribo_reads_target_1 <- input_data_max %>% group_by(locus_tag) %>% summarize(Sum_Norm_count_initiation = sum(Norm_count)) %>% mutate(Translation_initiation_Ratio = Sum_Norm_count_initiation/20)
@@ -213,6 +222,7 @@ Merged_ratios <- merge(df_Ribo_reads_target_1, df_Ribo_reads_target_2, by = "loc
 #Write into excel
 write_xlsx(Merged_ratios, "C:/Users/aagnoli/Desktop/Merged ppGpp 16h.xlsx")
 
+#----------------
 #write list of sequences for the motif search in kplogo
 write_csv(input_data_max, file = "C:/Users/aagnoli/Desktop/RBS_peak_finder_output_2.csv")
 
