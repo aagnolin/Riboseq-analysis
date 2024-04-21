@@ -134,26 +134,26 @@ Normalized_filtered_2X_Spin_Jun_53_full_11 <- read_csv("C:/Users/aagnoli/OneDriv
 #-------------
 ###INITIATION
 target_sequences_PeakFinder <- gene_info_df %>%
-  mutate(target_start = ifelse(Strand == "+", StartPosition - 15, EndPosition + 15),  #Write the numbers of the positions to select the range for sequence extraction (-15 +15)
-         target_end = ifelse(Strand == "+", StartPosition + 5, EndPosition + 5)) %>% #I checked the + and - signs and this looks correct (+5 +5)
+  mutate(target_start = ifelse(Strand == "+", StartPosition - 15, StartPosition - 15),  #Write the numbers of the positions to select the range for sequence extraction (-15 +15)
+         target_end = ifelse(Strand == "+", StartPosition + 5, StartPosition + 5)) %>% #I checked the + and - signs and this looks correct (+5 +5)
   select(LocusTag, target_start, target_end)
 
 ###ORF
 target_sequences_PeakFinder <- gene_info_df %>%
-  mutate(target_start = ifelse(Strand == "+", StartPosition + 5, EndPosition - 5),  #Write the numbers of the positions to select the range for sequence extraction (-15 +15)
-         target_end = ifelse(Strand == "+", EndPosition, StartPosition)) %>% #I checked the + and - signs and this looks correct (+5 +5)
+  mutate(target_start = ifelse(Strand == "+", StartPosition + 5, StartPosition + 5),  #Write the numbers of the positions to select the range for sequence extraction (-15 +15)
+         target_end = ifelse(Strand == "+", EndPosition, EndPosition)) %>% #I checked the + and - signs and this looks correct (+5 +5)
   select(LocusTag, target_start, target_end)
 
 ###CUSTOM
 target_sequences_PeakFinder <- gene_info_df %>%
-  mutate(target_start = ifelse(Strand == "+", StartPosition - 20, EndPosition + 20),  #Write the numbers of the positions to select the range for sequence extraction (-15 +15)
-         target_end = ifelse(Strand == "+", StartPosition + 40, EndPosition + 40)) %>% #I checked the + and - signs and this looks correct (+5 +5)
+  mutate(target_start = ifelse(Strand == "+", StartPosition - 20, StartPosition - 20),  #Write the numbers of the positions to select the range for sequence extraction (-15 +15)
+         target_end = ifelse(Strand == "+", StartPosition + 40, StartPosition + 40)) %>% #I checked the + and - signs and this looks correct (+5 +5)
   select(LocusTag, target_start, target_end)
 
 #-------------
 
 #select the input dataset from the ones loaded
-input_data <- N_ppGpp_16h_1_35_full %>% dplyr::rename(LocusTag = "locus_tag")
+input_data <- N_WT_8h_1_35_full %>% dplyr::rename(LocusTag = "locus_tag")
 input_data <- merge(input_data, target_sequences_PeakFinder, by = "LocusTag", all = TRUE)
 
 #Sequences outside the ORFs do not have a locus tag assigned, but this is necessary if we want to analyse peaks in the upstream region of the ORFs
