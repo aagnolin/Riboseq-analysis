@@ -71,6 +71,22 @@ No_treatment_2 <- read_csv(file = "C:/Users/aagnoli/OneDrive - UvA/RNA sequencin
 Tet_1 <- read_csv(file = "C:/Users/aagnoli/OneDrive - UvA/RNA sequencing data/Global analysis fixation conditions/Tet_1.csv")
 Tet_2 <- read_csv(file = "C:/Users/aagnoli/OneDrive - UvA/RNA sequencing data/Global analysis fixation conditions/Tet_2.csv")
 
+#normalized based on total number of reads
+N_Cm_1 <- read_csv("C:/Users/aagnoli/OneDrive - UvA/RNA sequencing data/Global analysis fixation conditions/Normalized by total number of reads/Normalized_Cm_1.csv")
+N_Cm_2 <- read_csv("C:/Users/aagnoli/OneDrive - UvA/RNA sequencing data/Global analysis fixation conditions/Normalized by total number of reads/Normalized_Cm_2.csv")
+N_dsp_1 <- read_csv("C:/Users/aagnoli/OneDrive - UvA/RNA sequencing data/Global analysis fixation conditions/Normalized by total number of reads/Normalized_dsp_1.csv")
+N_dsp_2 <- read_csv("C:/Users/aagnoli/OneDrive - UvA/RNA sequencing data/Global analysis fixation conditions/Normalized by total number of reads/Normalized_dsp_2.csv")
+N_dsp_for_1 <- read_csv("C:/Users/aagnoli/OneDrive - UvA/RNA sequencing data/Global analysis fixation conditions/Normalized by total number of reads/Normalized_dsp+for_1.csv")
+N_dsp_for_2 <- read_csv("C:/Users/aagnoli/OneDrive - UvA/RNA sequencing data/Global analysis fixation conditions/Normalized by total number of reads/Normalized_dsp+for_2.csv")
+N_for_1 <- read_csv("C:/Users/aagnoli/OneDrive - UvA/RNA sequencing data/Global analysis fixation conditions/Normalized by total number of reads/Normalized_for_1.csv")
+N_for_2 <- read_csv("C:/Users/aagnoli/OneDrive - UvA/RNA sequencing data/Global analysis fixation conditions/Normalized by total number of reads/Normalized_for_2.csv")
+N_meth_1 <- read_csv("C:/Users/aagnoli/OneDrive - UvA/RNA sequencing data/Global analysis fixation conditions/Normalized by total number of reads/Normalized_meth_1.csv")
+N_meth_2 <- read_csv("C:/Users/aagnoli/OneDrive - UvA/RNA sequencing data/Global analysis fixation conditions/Normalized by total number of reads/Normalized_meth_2.csv")
+N_No_1 <- read_csv("C:/Users/aagnoli/OneDrive - UvA/RNA sequencing data/Global analysis fixation conditions/Normalized by total number of reads/Normalized_No_1.csv")
+N_No_2 <- read_csv("C:/Users/aagnoli/OneDrive - UvA/RNA sequencing data/Global analysis fixation conditions/Normalized by total number of reads/Normalized_No_2.csv")
+N_Tet_1 <- read_csv("C:/Users/aagnoli/OneDrive - UvA/RNA sequencing data/Global analysis fixation conditions/Normalized by total number of reads/Normalized_Tet_1.csv")
+N_Tet_2 <- read_csv("C:/Users/aagnoli/OneDrive - UvA/RNA sequencing data/Global analysis fixation conditions/Normalized by total number of reads/Normalized_Tet_2.csv")
+
 #normalized with script (only ORFs)
 N_Cm_1 <- read_csv(file = "C:/Users/aagnoli/OneDrive - UvA/RNA sequencing data/Global analysis fixation conditions/Normalized only ORFs script, no intergenetic/Normalized_Cm_1.csv")
 N_Cm_2 <- read_csv(file = "C:/Users/aagnoli/OneDrive - UvA/RNA sequencing data/Global analysis fixation conditions/Normalized only ORFs script, no intergenetic/Normalized_Cm_2.csv")
