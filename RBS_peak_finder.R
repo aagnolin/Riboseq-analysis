@@ -161,33 +161,33 @@ N_Tet_2 <- read_csv("C:/Users/aagnoli/OneDrive - UvA/RNA sequencing data/Global 
 target_sequences_PeakFinder <- gene_info_df %>%
   mutate(target_start = ifelse(Strand == "+", StartPosition - 15, StartPosition - 15),  #Write the numbers of the positions to select the range for sequence extraction (-15 +15)
          target_end = ifelse(Strand == "+", StartPosition + 5, StartPosition + 5)) %>% #I checked the + and - signs and this looks correct (+5 +5)
-  select(locus_tag, target_start, target_end)
+  select(locus_tag, target_start, target_end, StartPosition)
 
 ###ORF
 target_sequences_PeakFinder <- gene_info_df %>%
   mutate(target_start = ifelse(Strand == "+", StartPosition + 5, StartPosition + 5),  #Write the numbers of the positions to select the range for sequence extraction (-15 +15)
          target_end = ifelse(Strand == "+", EndPosition, EndPosition)) %>% #I checked the + and - signs and this looks correct (+5 +5)
-  select(locus_tag, target_start, target_end)
+  select(locus_tag, target_start, target_end, StartPosition)
 
 ###CUSTOM (for CDS plots)
 target_sequences_PeakFinder <- gene_info_df %>%
   mutate(target_start = ifelse(Strand == "+", StartPosition - 20, StartPosition - 20),  #Write the numbers of the positions to select the range for sequence extraction (-15 +15)
          target_end = ifelse(Strand == "+", StartPosition + 40, StartPosition + 40)) %>% #I checked the + and - signs and this looks correct (+5 +5)
-  select(locus_tag, target_start, target_end)
+  select(locus_tag, target_start, target_end, StartPosition)
 
 #ASYMMETRY SCORE 5'
 target_sequences_PeakFinder <- data.frame(gene_info_df$gene_length)
 target_sequences_PeakFinder <- gene_info_df %>%
   mutate(target_start = ifelse(Strand == "+", StartPosition, StartPosition),  #Write the numbers of the positions to select the range for sequence extraction (-15 +15)
          target_end = ifelse(Strand == "+", floor(StartPosition + (gene_length/2)), floor(StartPosition + (gene_length/2)))) %>% #I checked the + and - signs and this looks correct (+5 +5)
-  select(locus_tag, target_start, target_end, gene_length)
+  select(locus_tag, target_start, target_end, gene_length, StartPosition)
 
 #ASYMMETRY SCORE 3'
 target_sequences_PeakFinder <- data.frame(gene_info_df$gene_length)
 target_sequences_PeakFinder <- gene_info_df %>%
   mutate(target_start = ifelse(Strand == "+", ceiling(StartPosition + (gene_length/2)), ceiling(StartPosition + (gene_length/2))),  #Write the numbers of the positions to select the range for sequence extraction (-15 +15)
          target_end = ifelse(Strand == "+", EndPosition, EndPosition)) %>% #I checked the + and - signs and this looks correct (+5 +5)
-  select(locus_tag, target_start, target_end, gene_length)
+  select(locus_tag, target_start, target_end, gene_length, StartPosition)
 
 #-------------
 
@@ -212,7 +212,7 @@ assign_locus_tag <- function(position) {
     mid <- floor((left + right) / 2)
     
     if (position >= target_sequences_PeakFinder_sorted[mid, "target_start"] && position <= target_sequences_PeakFinder_sorted[mid, "target_end"]) {
-      return(target_sequences_PeakFinder_sorted[mid, c("locus_tag", "target_start", "target_end")])
+      return(target_sequences_PeakFinder_sorted[mid, c("locus_tag", "target_start", "target_end", "StartPosition")])
     } else if (position < target_sequences_PeakFinder_sorted[mid, "target_start"]) {
       right <- mid - 1
     } else {
@@ -227,14 +227,13 @@ assign_locus_tag <- function(position) {
 for (i in 1:nrow(input_data)) {
   if (is.na(input_data[i, "locus_tag"])) {
     result <- assign_locus_tag(input_data[i, "position"])
-    input_data[i, c("locus_tag", "target_start", "target_end")] <- result
+    input_data[i, c("locus_tag", "target_start", "target_end", "StartPosition")] <- result
   }
 }
 
 #Filter highest peaks on target regions of each locus tag and calculate the position of those peaks relative to the 1st nt of the start codon
-#Filtered_input_data <- input_data %>% filter(locus_tag == "BSU13280" | locus_tag == "BSU13280" | locus_tag == "BSU37350" | locus_tag == "BSU28860" | locus_tag == "BSU36660" | locus_tag == "BSU36650" | locus_tag == "BSU03780" | locus_tag == "BSU14180" | locus_tag == "BSU18060" | locus_tag == "BSU28290" | locus_tag == "BSU08760", position >= target_start & position <= target_end)
 input_data_max <- group_by(input_data, locus_tag) %>% filter(position >= target_start & position <= target_end)
-input_data_max <- mutate(input_data_max, relative_position_RBS_peak = (target_end - position))
+input_data_max <- mutate(input_data_max, relative_position_RBS_peak = (position - StartPosition))
 
 
 
@@ -247,9 +246,7 @@ input_data_max <- merge(input_data_max, gene_info_df, by = "locus_tag", all = TR
 #plot results (also to double check your selection range is good)
 ggplot(data = input_data_max,
        mapping = aes(x = relative_position_RBS_peak)) +
-  geom_bar() +
-  scale_x_continuous(breaks = c(seq(-20,0, by = 1), seq(1, 40, by = 1))) + theme(axis.text.x = element_text(vjust = 0.5,
-    angle = 45))
+  geom_bar()
 
 #Export table to make CDS plots (if using CUSTOM target sequences)
 write.csv(input_data_max, "C:/Users/aagnoli/Desktop/ppGpp_16h_CDS_plot_data.csv", row.names = FALSE) 
