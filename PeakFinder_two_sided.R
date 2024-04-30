@@ -43,7 +43,8 @@ input_file_name <- tools::file_path_sans_ext(basename(alt_predict_file))
 output_left_side <- paste0(input_file_name, "_output_left_side.csv")
 output_right_side <- paste0(input_file_name, "_output_right_side.csv")
 merged_ratios <- paste0(input_file_name, "_merged_ratios.csv")
-plot_name <- paste0(input_file_name, "plot.pdf")
+plot_name <- paste0(input_file_name, "_plot.pdf")
+raw_plot <- paste0(input_file_name, "_raw_plot.csv")
 
 #Choose target positions
 target_sequences_PeakFinder <- gene_info_df %>%
@@ -167,7 +168,24 @@ write_csv(Merged_ratios, merged_ratios)
 #create final plot
 library(ggplot2)
 
-combined <- bind_rows(data_plot_left, input_data_max)
+combined <- bind_rows(data_plot_left, input_data_max) %>% select(-locus_tag, 
+                                                                 -genome, 
+                                                                 -position, 
+                                                                 -strand, 
+                                                                 -gene.x, 
+                                                                 -offset, 
+                                                                 -in_orf_90, 
+                                                                 -count, 
+                                                                 -Norm_count, 
+                                                                 -target_start, 
+                                                                 -target_end,
+                                                                 -EndPosition,
+                                                                 -Sequence, 
+                                                                 -Strand, 
+                                                                 -gene.y, 
+                                                                 -gene_length.y,
+                                                                 -StartPosition.x,
+                                                                 -StartPosition.y)
 
 p <- ggplot(data = combined,
             mapping = aes(x = relative_position)) +
@@ -192,6 +210,9 @@ p <- ggplot(data = combined,
                                         linetype = "blank"),
         panel.grid.minor = element_line(linetype = "blank"),
         panel.background = element_rect(linetype = "solid"))
+
+#Write raw data for plot
+write_csv(combined, raw_plot)
 
 #generate plot
 ggsave(plot = p, filename = plot_name, device = "pdf")
