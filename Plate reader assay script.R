@@ -80,40 +80,35 @@ final_plate_reader_merged$IPTG[final_plate_reader_merged$Sample %in% c(paste0("D
 #-------------------------------------------------------
 
 ##Experiment 24/04/2024
-sample_name_mapping_07_03_2024 <- c("A1" = "clone 1",
-                                    "B1" = "clone 8",
-                                    "D1" = "clone 1",
-                                    "E1" = "clone 8", 
-                                    "A2" = "clone 2",
-                                    "B2" = "clone 9",
-                                    "D2" = "clone 2",
-                                    "E2" = "clone 9",
-                                    "A3" = "clone 3",
-                                    "B3" = "clone 10",
-                                    "D3" = "clone 3",
-                                    "E3" = "clone 10",
-                                    "A4" = "clone 4",
-                                    "B4" = "clone 11",
-                                    "D4" = "clone 4",
-                                    "E4" = "clone 11",
-                                    "A5" = "clone 5",
-                                    "B5" = "clone 12",
-                                    "D5" = "clone 5",
-                                    "E5" = "clone 12",
-                                    "A6" = "clone 6",
-                                    "B6" = "clone 13",
-                                    "D6" = "clone 6",
-                                    "E6" = "clone 13",
-                                    "A7" = "clone 7",
-                                    "B7" = "WT",
-                                    "D7" = "clone 7",
-                                    "E7" = "WT") #pass all the names based on the wells that have been used
+sample_name_mapping_24_04_2024 <- c("A1" = "BAA002",
+                                    "A2" = "BAA013",
+                                    "A3" = "BAA014",
+                                    "A4" = "BAA015", 
+                                    "A5" = "BAA016",
+                                    "A6" = "BAA020",
+                                    "A7" = "BAA033",
+                                    "A8" = "BAA034",
+                                    "A9" = "WT",
+                                    "A10" = "CLONE 2",
+                                    "A11" = "CLONE 13",
+                                    "A12" = "- CTRL",
+                                    "C1" = "BAA002",
+                                    "C2" = "BAA013",
+                                    "C3" = "BAA014",
+                                    "C4" = "BAA015", 
+                                    "C5" = "BAA016",
+                                    "C6" = "BAA020",
+                                    "C7" = "BAA033",
+                                    "C8" = "BAA034",
+                                    "C9" = "WT",
+                                    "C10" = "CLONE 2",
+                                    "C11" = "CLONE 13",
+                                    "C12" = "- CTRL") #pass all the names based on the wells that have been used
 
 ## Assign specific values to samples
-final_plate_reader_merged$Medium[final_plate_reader_merged$Sample %in% c(paste0("A",  seq(from = 1, to = 7, by = 2)), paste0("B",  seq(from = 1, to = 7, by = 2)))] <- "MM" #add more variables as done here if required
-final_plate_reader_merged$Medium[final_plate_reader_merged$Sample %in% c(paste0("D",  seq(from = 1, to = 7, by = 2)), paste0("E",  seq(from = 1, to = 7, by = 2)))] <- "MM"
-final_plate_reader_merged$IPTG[final_plate_reader_merged$Sample %in% c(paste0("A",  seq(from = 1, to = 7, by = 2)), paste0("B",  seq(from = 1, to = 7, by = 2)))] <- "0 mM"
-final_plate_reader_merged$IPTG[final_plate_reader_merged$Sample %in% c(paste0("D",  seq(from = 1, to = 7, by = 2)), paste0("E",  seq(from = 1, to = 7, by = 2)))] <- "1 mM"
+final_plate_reader_merged$Medium[final_plate_reader_merged$Sample %in% c(paste0("A",  seq(from = 1, to = 12)), paste0("C",  seq(from = 1, to = 12)))] <- "MM" #add more variables as done here if required
+final_plate_reader_merged$IPTG[final_plate_reader_merged$Sample %in% paste0("A",  seq(from = 1, to = 12))] <- "0 mM"
+final_plate_reader_merged$IPTG[final_plate_reader_merged$Sample %in% paste0("C",  seq(from = 1, to = 12))] <- "1 mM"
 
 #------------------------------
 #Experiment 27/02/2024
@@ -198,7 +193,7 @@ final_plate_reader_merged <- final_plate_reader_merged %>% drop_na() #Once you h
 
 #Give sample names to wells
 ## Define a vector to map old sample names to new ones
-sample_name_mapping <- sample_name_mapping_27_02_2024
+sample_name_mapping <- sample_name_mapping_24_04_2024
 
 ## Update the Sample column with the new names
 final_plate_reader_merged$Sample <- ifelse(final_plate_reader_merged$Sample %in% names(sample_name_mapping), 
@@ -303,13 +298,33 @@ final_plate_reader_merged$Sample <- ifelse(final_plate_reader_merged$Sample %in%
                                            sample_name_mapping[final_plate_reader_merged$Sample], 
                                            final_plate_reader_merged$Sample)
 
-ggplot(data = filter(final_plate_reader_merged, Sample != "clone 1" & Sample != "WT", Medium == "MM", IPTG == "1 mM"),
+#Plot with OD and GFP
+ggplot(data = filter(final_plate_reader_merged, IPTG == "1 mM"),
        mapping = aes(x = Time,
                      group = Sample)) +
-  geom_point(aes(y = GFP_value, shape = Sample)) +
-  geom_line(aes(y = GFP_value), col = 'limegreen') +
-  geom_point(aes(y = OD_value*20000, shape = Sample)) +
-  geom_line(aes(y = OD_value*20000), col = "black") +
+  geom_point(aes(y = GFP_value), shape = 1) +
+  geom_line(aes(y = GFP_value, col = Sample)) +
+  geom_point(aes(y = OD_value*20000)) +
+  geom_line(aes(y = OD_value*20000, col = Sample)) +
+  geom_text(data = . %>% group_by(Sample) %>% slice_tail(n = 1),  # Labels at the end of each curve
+            aes(label = Sample, x = Time, y = OD_value*20000, color = Sample),
+            hjust = 1.2, vjust = 0.5, size = 3) +  # Adjust position and size of the labels
   scale_y_continuous(sec.axis = sec_axis(~./20000 , name = 'OD value')) +
   labs(y = "GFP value") +
   theme_bw()
+
+#Plot with OD and mCherry
+ggplot(data = filter(final_plate_reader_merged, Sample == "BAA033" | Sample == "BAA034", IPTG == "1 mM"),
+       mapping = aes(x = Time,
+                     group = Sample)) +
+  geom_point(aes(y = mCherry_value), shape = 1) +
+  geom_line(aes(y = mCherry_value, col = Sample)) +
+  geom_point(aes(y = OD_value)) +
+  geom_line(aes(y = OD_value, col = Sample)) +
+  geom_text(data = . %>% group_by(Sample) %>% slice_tail(n = 1),  # Labels at the end of each curve
+            aes(label = Sample, x = Time, y = OD_value, color = Sample),
+            hjust = 1.2, vjust = 0.5, size = 3) +  # Adjust position and size of the labels
+  scale_y_continuous(sec.axis = sec_axis(~. , name = 'OD value')) +
+  labs(y = "GFP value") +
+  theme_bw()
+
