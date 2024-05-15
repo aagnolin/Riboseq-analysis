@@ -108,7 +108,24 @@ sample_name_mapping_24_04_2024 <- c("A1" = "BAA002",
 ## Assign specific values to samples
 final_plate_reader_merged$Medium[final_plate_reader_merged$Sample %in% c(paste0("A",  seq(from = 1, to = 12)), paste0("C",  seq(from = 1, to = 12)))] <- "MM" #add more variables as done here if required
 final_plate_reader_merged$IPTG[final_plate_reader_merged$Sample %in% paste0("A",  seq(from = 1, to = 12))] <- "0 mM"
-final_plate_reader_merged$IPTG[final_plate_reader_merged$Sample %in% paste0("C",  seq(from = 1, to = 12))] <- "1 mM"
+final_plate_reader_merged$IPTG[final_plate_reader_merged$Sample %in% paste0("C",  seq(from = 1, to = 12))] <- "10 mM"
+
+#-------------------------------------------------------
+
+##Experiment 14/05/2024
+sample_name_mapping_14_05_2024 <- c("C1" = "BAA033",
+                                    "C3" = "BAA034",
+                                    "C5" = "WT",
+                                    "C7" = "- CTRL", 
+                                    "E1" = "BAA033",
+                                    "E3" = "BAA034",
+                                    "E5" = "WT",
+                                    "E7" = "- CTRL") #pass all the names based on the wells that have been used
+
+## Assign specific values to samples
+final_plate_reader_merged$Medium[final_plate_reader_merged$Sample %in% c(paste0("C",  seq(from = 1, to = 7, by = 2)), paste0("E",  seq(from = 1, to = 7, by = 2)))] <- "MM" #add more variables as done here if required
+final_plate_reader_merged$IPTG[final_plate_reader_merged$Sample %in% paste0("C",  seq(from = 1, to = 7, by = 2))] <- "0 mM"
+final_plate_reader_merged$IPTG[final_plate_reader_merged$Sample %in% paste0("E",  seq(from = 1, to = 7, by = 2))] <- "10 mM"
 
 #------------------------------
 #Experiment 27/02/2024
@@ -129,10 +146,19 @@ input_GFP <- read_xlsx("C:/Users/aagnoli/OneDrive - UvA/WP 4 - Translation repor
 ##OD600 dataset
 input_OD <- read_xlsx("C:/Users/aagnoli/OneDrive - UvA/WP 4 - Translation reporter system/Plate reader assays/2024-04-24 GFP and mCherry/2024-04-24 OD.xlsx")
 ##GFP dataset
-input_GFP <- read_xlsx("C:/Users/aagnoli/OneDrive - UvA/WP 4 - Translation reporter system//Plate reader assays/2024-04-24 GFP and mCherry/2024-04-24 GFP.xlsx")
+input_GFP <- read_xlsx("C:/Users/aagnoli/OneDrive - UvA/WP 4 - Translation reporter system/Plate reader assays/2024-04-24 GFP and mCherry/2024-04-24 GFP.xlsx")
 ##mCherry dataset
-input_mCherry <- read_xlsx("C:/Users/aagnoli/OneDrive - UvA/WP 4 - Translation reporter system//Plate reader assays/2024-04-24 GFP and mCherry/2024-04-24 mCherry.xlsx")
-#------------------------------
+input_mCherry <- read_xlsx("C:/Users/aagnoli/OneDrive - UvA/WP 4 - Translation reporter system/Plate reader assays/2024-04-24 GFP and mCherry/2024-04-24 mCherry.xlsx")
+
+#-------------------------------
+#Experiment 14/05/2024
+##OD600 dataset
+input_OD <- read_xlsx("C:/Users/aagnoli/OneDrive - UvA/WP 4 - Translation reporter system/Plate reader assays/2024-05-14 BAA033 and BAA034 GFP and mCherry new settings/2024-05-14 OD.xlsx")
+##GFP dataset
+input_GFP <- read_xlsx("C:/Users/aagnoli/OneDrive - UvA/WP 4 - Translation reporter system/Plate reader assays/2024-05-14 BAA033 and BAA034 GFP and mCherry new settings/2024-05-14 GFP.xlsx")
+##mCherry dataset
+input_mCherry <- read_xlsx("C:/Users/aagnoli/OneDrive - UvA/WP 4 - Translation reporter system/Plate reader assays/2024-05-14 BAA033 and BAA034 GFP and mCherry new settings/2024-05-14 mCherry.xlsx")
+#==================================
 
 #remove date that is created when importing the excel files
 input_OD$Time <- gsub("^1899-12-31 ", "", input_OD$Time)
@@ -183,8 +209,8 @@ final_plate_reader_merged <- merge(longer_merged_OD, longer_merged_GFP, by = c("
 final_plate_reader_merged$Medium <- NA
 final_plate_reader_merged$IPTG <- NA
 
-## Assign specific values to samples
-final_plate_reader_merged$Medium[final_plate_reader_merged$Sample %in% c(paste0("A",  seq(from = 1, to = 12, by = 2)), paste0("C",  seq(from = 1, to = 12, by = 2)), "A12", "C12")] <- "MM" #add more variables as done here if required
+## Assign specific values to samples (replace with lines under each experiment's date found at the start of the script)
+final_plate_reader_merged$Medium[final_plate_reader_merged$Sample %in% c(paste0("A",  seq(from = 1, to = 12, by = 2)), paste0("C",  seq(from = 1, to = 12, by = 2)), "A12", "C12")] <- "MM"
 final_plate_reader_merged$Medium[final_plate_reader_merged$Sample %in% c(paste0("E",  seq(from = 1, to = 12, by = 2)), paste0("G",  seq(from = 1, to = 12, by = 2)), "E12", "G12")] <- "LB"
 final_plate_reader_merged$IPTG[final_plate_reader_merged$Sample %in% c(paste0("A",  seq(from = 1, to = 12, by = 2)), paste0("E",  seq(from = 1, to = 12, by = 2)), "A12", "E12")] <- "0 mM"
 final_plate_reader_merged$IPTG[final_plate_reader_merged$Sample %in% c(paste0("C",  seq(from = 1, to = 12, by = 2)), paste0("G",  seq(from = 1, to = 12, by = 2)), "C12", "G12")] <- "1 mM"
@@ -193,7 +219,7 @@ final_plate_reader_merged <- final_plate_reader_merged %>% drop_na() #Once you h
 
 #Give sample names to wells
 ## Define a vector to map old sample names to new ones
-sample_name_mapping <- sample_name_mapping_24_04_2024
+sample_name_mapping <- sample_name_mapping_24_04_2024 #choose the one corresponding to the experiment data (see experiment dates at the start of the script)
 
 ## Update the Sample column with the new names
 final_plate_reader_merged$Sample <- ifelse(final_plate_reader_merged$Sample %in% names(sample_name_mapping), 
@@ -239,7 +265,7 @@ input_mCherry$Time <- input_OD$Time
 #remove temperature column
 input_OD <- input_OD %>% select(-"T° Read 3:600")
 input_GFP <- input_GFP %>% select(-"T° GFP_mCherry:485,528")
-input_mCherry <- input_mCherry %>% select(-"T° GFP_mCherry:587,610")
+input_mCherry <- input_mCherry %>% select(-"T° GFP_mCherry:583,613") #NOTE: when using experiments before the one on 14/05/2024, use "T° GFP_mCherry:587,610"
 
 #merge OD, GFP and mCherry data frames
 merged_plate_reader_OD_GFP <- merge(input_OD, input_GFP, by = c("Time"), suffixes = c("_OD", "_GFP"))
@@ -282,16 +308,16 @@ final_plate_reader_merged$Medium <- NA
 final_plate_reader_merged$IPTG <- NA
 
 ## Assign specific values to samples
-final_plate_reader_merged$Medium[final_plate_reader_merged$Sample %in% c(paste0("A",  seq(from = 1, to = 12, by = 2)), paste0("C",  seq(from = 1, to = 12, by = 2)), "A12", "C12")] <- "MM" #add more variables as done here if required
-final_plate_reader_merged$Medium[final_plate_reader_merged$Sample %in% c(paste0("E",  seq(from = 1, to = 12, by = 2)), paste0("G",  seq(from = 1, to = 12, by = 2)), "E12", "G12")] <- "LB"
-final_plate_reader_merged$IPTG[final_plate_reader_merged$Sample %in% c(paste0("A",  seq(from = 1, to = 12, by = 2)), paste0("E",  seq(from = 1, to = 12, by = 2)), "A12", "E12")] <- "0 mM"
-final_plate_reader_merged$IPTG[final_plate_reader_merged$Sample %in% c(paste0("C",  seq(from = 1, to = 12, by = 2)), paste0("G",  seq(from = 1, to = 12, by = 2)), "C12", "G12")] <- "1 mM"
+final_plate_reader_merged$Medium[final_plate_reader_merged$Sample %in% c(paste0("C",  seq(from = 1, to = 7, by = 2)), paste0("E",  seq(from = 1, to = 7, by = 2)))] <- "MM" #add more variables as done here if required
+final_plate_reader_merged$IPTG[final_plate_reader_merged$Sample %in% paste0("C",  seq(from = 1, to = 7, by = 2))] <- "0 mM"
+final_plate_reader_merged$IPTG[final_plate_reader_merged$Sample %in% paste0("E",  seq(from = 1, to = 7, by = 2))] <- "10 mM"
+
 
 final_plate_reader_merged <- final_plate_reader_merged %>% drop_na() #Once you have passed in the medium only to the full wells, use this function to remove all other wells that have not been used
 
 #Give sample names to wells
 ## Define a vector to map old sample names to new ones
-sample_name_mapping <- sample_name_mapping_27_02_2024
+sample_name_mapping <- sample_name_mapping_24_04_2024
 
 ## Update the Sample column with the new names
 final_plate_reader_merged$Sample <- ifelse(final_plate_reader_merged$Sample %in% names(sample_name_mapping), 
@@ -299,32 +325,32 @@ final_plate_reader_merged$Sample <- ifelse(final_plate_reader_merged$Sample %in%
                                            final_plate_reader_merged$Sample)
 
 #Plot with OD and GFP
-ggplot(data = filter(final_plate_reader_merged, IPTG == "1 mM"),
+ggplot(data = filter(final_plate_reader_merged, Sample == "BAA013" | Sample == "BAA033" | Sample == "- CTRL", IPTG == "10 mM"),
        mapping = aes(x = Time,
                      group = Sample)) +
   geom_point(aes(y = GFP_value), shape = 1) +
   geom_line(aes(y = GFP_value, col = Sample)) +
-  geom_point(aes(y = OD_value*20000)) +
-  geom_line(aes(y = OD_value*20000, col = Sample)) +
-  geom_text(data = . %>% group_by(Sample) %>% slice_tail(n = 1),  # Labels at the end of each curve
-            aes(label = Sample, x = Time, y = OD_value*20000, color = Sample),
-            hjust = 1.2, vjust = 0.5, size = 3) +  # Adjust position and size of the labels
-  scale_y_continuous(sec.axis = sec_axis(~./20000 , name = 'OD value')) +
+  geom_point(aes(y = OD_value*30000)) +
+  geom_line(aes(y = OD_value*30000, col = Sample)) +
+  #geom_text(data = . %>% group_by(Sample) %>% slice_tail(n = 1),  # Labels at the end of each curve
+            #aes(label = Sample, x = Time, y = OD_value*30000, color = Sample),
+            #hjust = 1.2, vjust = 0.5, size = 3) +  # Adjust position and size of the labels
+  scale_y_continuous(sec.axis = sec_axis(~./30000 , name = 'OD value')) +
   labs(y = "GFP value") +
   theme_bw()
 
 #Plot with OD and mCherry
-ggplot(data = filter(final_plate_reader_merged, Sample == "BAA033" | Sample == "BAA034", IPTG == "1 mM"),
+ggplot(data = filter(final_plate_reader_merged, Sample == "BAA033" | Sample == "BAA034" | Sample == "- CTRL", IPTG == "10 mM"),
        mapping = aes(x = Time,
                      group = Sample)) +
   geom_point(aes(y = mCherry_value), shape = 1) +
   geom_line(aes(y = mCherry_value, col = Sample)) +
-  geom_point(aes(y = OD_value)) +
-  geom_line(aes(y = OD_value, col = Sample)) +
-  geom_text(data = . %>% group_by(Sample) %>% slice_tail(n = 1),  # Labels at the end of each curve
-            aes(label = Sample, x = Time, y = OD_value, color = Sample),
-            hjust = 1.2, vjust = 0.5, size = 3) +  # Adjust position and size of the labels
-  scale_y_continuous(sec.axis = sec_axis(~. , name = 'OD value')) +
-  labs(y = "GFP value") +
+  geom_point(aes(y = OD_value*5000), shape = 16) +
+  geom_line(aes(y = OD_value*5000, col = Sample)) +
+  #geom_text(data = . %>% group_by(Sample) %>% slice_tail(n = 1),  # Labels at the end of each curve
+            #aes(label = Sample, x = Time, y = OD_value/5000, color = Sample),
+            #hjust = 1.2, vjust = 0.5, size = 3) +  # Adjust position and size of the labels
+  scale_y_continuous(sec.axis = sec_axis(~./5000 , name = 'OD value')) +
+  labs(y = "mCherry value") +
   theme_bw()
 
