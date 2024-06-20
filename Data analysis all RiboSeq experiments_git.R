@@ -37,6 +37,11 @@ filtered_2X_PEG_July_35_full_July_2023 <- read_csv("C:/Users/aagnoli/OneDrive - 
 filtered_1X_PEG_Spin_July_35_full_July_2023 <- read_csv("C:/Users/aagnoli/OneDrive - UvA/RNA sequencing data/July 2023/alt_predict_v2_results_July_2023/filtered_1X_PEG-Spin_July_35_full.csv")
 filtered_Histag1_July_35_full_July_2023 <- read_csv("C:/Users/aagnoli/OneDrive - UvA/RNA sequencing data/July 2023/alt_predict_v2_results_July_2023/filtered_Histag1_July_35_full.csv")
 filtered_Histag2_July_35_full_July_2023 <- read_csv("C:/Users/aagnoli/OneDrive - UvA/RNA sequencing data/July 2023/alt_predict_v2_results_July_2023/filtered_Histag2_July_35_full.csv")
+##June 2024 (Mupirocin)
+mapped_3_6_MONO_35_full <- read_csv("C:/Users/aagnoli/OneDrive - UvA/RNA sequencing data/June 2024/alt_predict_v2_results_June_2024/mapped_3_6_MONO_35_full.csv")
+mapped_3_6_DISOME_35_full <- read_csv("C:/Users/aagnoli/OneDrive - UvA/RNA sequencing data/June 2024/alt_predict_v2_results_June_2024/mapped_3_6_DISOME_35_full.csv")
+mapped_10_MONO_35_full <- read_csv("C:/Users/aagnoli/OneDrive - UvA/RNA sequencing data/June 2024/alt_predict_v2_results_June_2024/mapped_10_MONO_35_full.csv")
+mapped_10_DISOME_35_full <- read_csv("C:/Users/aagnoli/OneDrive - UvA/RNA sequencing data/June 2024/alt_predict_v2_results_June_2024/mapped_10_DISOME_35_full.csv")
 ###Quality control of datasets
 Sequence_length_distributions_all_samples <- read_xlsx("C:/Users/aagnoli/OneDrive - UvA/RNA sequencing data/Sequence Length Distributions - all sequencing files.xlsx")
 Sequence_length_distributions_all_samples$`Date of Experiment` <- format(Sequence_length_distributions_all_samples$`Date of Experiment`, format = "%b-%y")
@@ -370,8 +375,8 @@ Normalized_riboseq_2 <- mutate(riboseq_2, Norm_count = riboseq_2$Avg_Norm_reads*
 #-----------------------------------------------------
 
 #Paste here the name of the 2 files to compare (set file with higher total number of sequences as riboseq_1 for normalization at later steps)
-riboseq_1 <- form_Avg
-riboseq_2 <- dsp_form_Avg
+riboseq_1 <- X16h_2_ribo
+riboseq_2 <- X16h_1_ribo
 
 #===========================
 #FURTHER CLEANING OF alt_predict DATASETS
@@ -493,13 +498,13 @@ all_data <- all_data %>%
             suffix = c('_1', '_2'))
 
 # Filter data for the gene of interest
-gene_of_interest <- "glnA" # or gene name
+gene_of_interest <- "kduD" # or gene name
 filtered_data <- all_data %>% 
   ##filter(locus_tag_1 == gene_of_interest | locus_tag_2 == gene_of_interest) #use this if you use pass the locus tag to the gene_of_interest vector
   filter(gene_1 == gene_of_interest | gene_2 == gene_of_interest) #use this if you use the gene name on the gene_of_interest
 
 # Plot the data
-Plot <- ggplot(data = filtered_data,
+Plot <- ggplot(data = filtered_data, #if you use AmyI, use this data: filtered_data, position >= 4216116, position <= 4218275
                mapping = aes(x = position)) +
   geom_col(aes(y = coalesce(Norm_count_1, 0)), fill = 'navy', size = 1, alpha = 0.5) +
   geom_col(aes(y = coalesce(Norm_count_2, 0)), fill = 'orange', size = 1, alpha = 0.5) +
@@ -1087,20 +1092,21 @@ ggplot(data = filter(Sequence_length_distributions_all_samples, Sample == "Hista
 
 #RNA FRACTIONS
 
-ggplot(data = filter(RNA_fractions_all_samples, Sample == "2X PEG", `Date of Experiment` == "Jan-23"), 
+ggplot(data = filter(RNA_fractions_all_samples, `Date of Experiment` == "Jun-24", Fraction != "Total"), 
        mapping = aes(x = "", y = Percentage, fill = Fraction)
 ) + 
   geom_bar(width = 1, stat = "identity", col = 'black', linewidth = 0.5) +
-  geom_text(aes(label = paste(Percentage, "%")),
-            position = position_stack(vjust = 0.5),
-            colour = 'white') +
+  #geom_text(aes(label = paste(round(Percentage, 1), "%")),
+   #         position = position_stack(vjust = 0.5),
+    #        colour = 'white') +
   theme_classic() +
   theme(plot.title = element_text(hjust=0.5),
         axis.line = element_blank(),
         axis.text = element_blank(),
         axis.ticks = element_blank()) + 
   coord_polar("y") +
-  labs(x = NULL, y = NULL)
+  labs(x = NULL, y = NULL) +
+  facet_grid(~Sample)
 
 
 #=======================================
