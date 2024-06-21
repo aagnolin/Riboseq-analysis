@@ -1063,7 +1063,7 @@ ggplot(data = as.data.frame(logData_codon_floor),
 
 #SEQUENCE LENGTH DISTRIBUTION
 
-ggplot(data = filter(Sequence_length_distributions_all_samples, Sample == "Histag Lysate", `Date of Experiment` == "Jun-23"),
+ggplot(data = filter(Sequence_length_distributions_all_samples, `Date of Experiment` == "Jun-24"),
        mapping = aes(
          x = `Length (nt)`,
          y = Frequency
@@ -1073,6 +1073,7 @@ ggplot(data = filter(Sequence_length_distributions_all_samples, Sample == "Hista
   scale_y_continuous(expand = c(0,0), limits = c(0, 23)) +
   theme_bw() +
   labs(colour = "Sample") +
+  facet_wrap(~Sample) +
   theme(legend.position = 'none') +
   theme(legend.background = element_rect(colour = 'black', fill = 'white', linetype='solid'),
         legend.key.height= unit(0.05, 'cm'),
