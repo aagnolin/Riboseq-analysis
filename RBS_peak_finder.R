@@ -155,6 +155,8 @@ N_Tet_1 <- read_csv("C:/Users/aagnoli/OneDrive - UvA/RNA sequencing data/Global 
 N_Tet_2 <- read_csv("C:/Users/aagnoli/OneDrive - UvA/RNA sequencing data/Global analysis fixation conditions/Normalized by total number of reads/Normalized_Tet_2.csv")
 
 
+
+
 #Choose target positions (works in the same way as Sequence Finder. Takes strand directionality into consideration
 #-------------
 ###INITIATION
@@ -172,7 +174,7 @@ target_sequences_PeakFinder <- gene_info_df %>%
 ###CUSTOM (for CDS plots)
 target_sequences_PeakFinder <- gene_info_df %>%
   mutate(target_start = ifelse(Strand == "+", StartPosition - 20, StartPosition - 20),  #Write the numbers of the positions to select the range for sequence extraction (-15 +15)
-         target_end = ifelse(Strand == "+", StartPosition + 40, StartPosition + 40)) %>% #I checked the + and - signs and this looks correct (+5 +5)
+         target_end = ifelse(Strand == "+", StartPosition + 200, StartPosition + 200)) %>% #I checked the + and - signs and this looks correct (+5 +5)
   select(locus_tag, target_start, target_end, StartPosition)
 
 #ASYMMETRY SCORE 5'
@@ -191,9 +193,9 @@ target_sequences_PeakFinder <- gene_info_df %>%
 
 #-------------
 
-#select the input dataset from the ones loaded
-input_data <- Normalized_212_8h_1_53_full
-#-----
+#select the input dataset from the ones loaded and cleanup residual ncRNA
+input_data <- mapped_10_MONO_35_full %>% filter(!grepl("^BSU_", locus_tag))
+#-------------
 N_Tet_1 <- merge(N_Tet_1, gene_info_df, by = "gene", all = T) %>% select(-StartPosition, - EndPosition, - Sequence, - Strand, - gene_length.y) #if the previous command does not work it means the dataset does not have the locustag, so use this command by changing the name of your starting dataset
 input_data <- N_Tet_1
 #-----
@@ -246,7 +248,9 @@ input_data_max <- merge(input_data_max, gene_info_df, by = "locus_tag", all = TR
 #plot results (also to double check your selection range is good)
 ggplot(data = input_data_max,
        mapping = aes(x = relative_position_RBS_peak)) +
-  geom_bar()
+  geom_bar(alpha = 0.3) +
+  geom_freqpoly(binwidth = 1, linewidth = 1) + 
+  theme_bw()
 
 #Export table to make CDS plots (if using CUSTOM target sequences)
 write.csv(input_data_max, "C:/Users/aagnoli/Desktop/ppGpp_16h_CDS_plot_data.csv", row.names = FALSE) 
