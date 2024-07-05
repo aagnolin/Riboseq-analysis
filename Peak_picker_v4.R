@@ -10,39 +10,31 @@ if (length(commandArgs(trailingOnly = TRUE)) == 0 || any(commandArgs(trailingOnl
   cat("<input_folder>     : Path to the input folder containing CSV files.\n")
   cat("<output_folder>    : Path to the output folder where files will be saved.\n")
   cat("<codon_table>      : Path to the codon usage table Excel file.\n")
-  cat("[method]           : Method for calculating codon observations ('cumulative' for cumulative method, default is 'single').\n")
-  cat("[filter_threshold] : Optional filter threshold for data (only include data with count >= filter_threshold).\n")
+  cat("[filter_threshold] : Optional filter threshold for data (only include data with count >= filter_threshold) [DEFAULT = 1].\n")
   cat("\n")
   cat("Description:\n")
-  cat("This script performs two actions on the alt_predict_v2 output files supplied in the input folder:\n")
-  cat("it creates a table containing only the highest peaks per each gene and another table with the pause\n")
+  cat("This script performs multiple actions on the alt_predict_v2 output files supplied in the input folder:\n")
+  cat("it first creates a table containing only the highest peak(s) for each gene and after applying the user-defined\n") 
+  cat("count threshold (or not if not specified) another table with the pause\n")
   cat("codon of all peaks present in the input file.\n")
-  cat("Additionally, it uses the output file with the extracted pause codons and an additional excel file\n")
+  cat("It then uses the output file with the extracted pause codons and an additional excel file\n")
   cat("(supplied by the user) containing the usage per codon values of the studied organism and generates\n")
   cat("plots comparing codon usage vs codon occupancy for each file and saves them as SVG images.\n")
+  cat("The data used for producing the plots is also exported as a .csv file.\n")
+  cat("A density plot is generated to show which is the fraction of peaks that was used in the analysis based on the filter_threshold\n")
   cat("\n")
   cat("Example Usage:\n")
   cat("--------------\n")
   cat("Rscript script_name.R /path/to/input/folder /path/to/output/folder /path/to/codon/table.xlsx\n")
-  cat("Rscript script_name.R /path/to/input/folder /path/to/output/folder /path/to/codon/table.xlsx cumulative\n")
-  cat("Rscript script_name.R /path/to/input/folder /path/to/output/folder /path/to/codon/table.xlsx single 100\n")
+  cat("Rscript script_name.R /path/to/input/folder /path/to/output/folder /path/to/codon/table.xlsx 100\n")
   cat("\n")
   quit(status = 0)
 }
 
-# Parse the optional argument for method
-method <- "single"  # Default method is "single"
-if (length(commandArgs(trailingOnly = TRUE)) > 3) {
-  specified_method <- commandArgs(trailingOnly = TRUE)[4]
-  if (specified_method == "cumulative") {
-    method <- specified_method
-  }
-}
-
 # Parse the optional argument for filter_threshold
-filter_threshold <- NA
-if (length(commandArgs(trailingOnly = TRUE)) > 4) {
-  filter_threshold <- as.numeric(commandArgs(trailingOnly = TRUE)[5])
+filter_threshold <- 1
+if (length(commandArgs(trailingOnly = TRUE)) > 3) {
+  filter_threshold <- as.numeric(commandArgs(trailingOnly = TRUE)[4])
 }
 
 # Load required libraries
@@ -211,27 +203,24 @@ for (input_file in input_files) {
   Codon_usage_table <- read_excel(codon_table)
   
   #Calculate Codon Pause Score
-  #method "single" for Pause_codon
-  if (method == "single") {
-    Codon_pause_score_df_A_site <- Super_codonator_output_filtered %>% group_by(A_site) %>% summarise(Codon_pause_score_A_site = sum(Pause_score)) %>% rename(Codon = A_site)
-    Codon_pause_score_df_P_site <- Super_codonator_output_filtered %>% group_by(P_site) %>% summarise(Codon_pause_score_P_site = sum(Pause_score)) %>% rename(Codon = P_site)
-    Codon_pause_score_df_E_site <- Super_codonator_output_filtered %>% group_by(E_site) %>% summarise(Codon_pause_score_E_site = sum(Pause_score)) %>% rename(Codon = E_site)
-    Codon_pause_score_df <- merge(Codon_pause_score_df_A_site, Codon_pause_score_df_E_site, by = "Codon") %>% merge(Codon_pause_score_df_P_site, by = "Codon")
-    Super_codonator_output_filtered_ORFs <- Super_codonator_output_filtered %>% drop_na(A_site)
-    Total_counts_ORFs <- sum(Super_codonator_output_filtered_ORFs$Norm_count)
-    Codon_pause_score_df <- Codon_pause_score_df %>% mutate(Normalised_codon_pause_score_A_site = Codon_pause_score_df$Codon_pause_score_A_site/Total_counts_ORFs, 
-                                                            Normalised_codon_pause_score_P_site = Codon_pause_score_df$Codon_pause_score_P_site/Total_counts_ORFs, 
-                                                            Normalised_codon_pause_score_E_site = Codon_pause_score_df$Codon_pause_score_E_site/Total_counts_ORFs)
-  }
+  Codon_pause_score_df_A_site <- Super_codonator_output_filtered %>% group_by(A_site) %>% summarise(Codon_pause_score_A_site = sum(Pause_score)) %>% rename(Codon = A_site)
+  Codon_pause_score_df_P_site <- Super_codonator_output_filtered %>% group_by(P_site) %>% summarise(Codon_pause_score_P_site = sum(Pause_score)) %>% rename(Codon = P_site)
+  Codon_pause_score_df_E_site <- Super_codonator_output_filtered %>% group_by(E_site) %>% summarise(Codon_pause_score_E_site = sum(Pause_score)) %>% rename(Codon = E_site)
+  Codon_pause_score_df <- merge(Codon_pause_score_df_A_site, Codon_pause_score_df_E_site, by = "Codon") %>% merge(Codon_pause_score_df_P_site, by = "Codon")
+  Super_codonator_output_filtered_ORFs <- Super_codonator_output_filtered %>% drop_na(A_site)
+  Total_counts_ORFs <- sum(Super_codonator_output_filtered_ORFs$Norm_count)
+  Codon_pause_score_df <- Codon_pause_score_df %>% mutate(Normalised_codon_pause_score_A_site = Codon_pause_score_df$Codon_pause_score_A_site/Total_counts_ORFs, 
+                                                          Normalised_codon_pause_score_P_site = Codon_pause_score_df$Codon_pause_score_P_site/Total_counts_ORFs, 
+                                                          Normalised_codon_pause_score_E_site = Codon_pause_score_df$Codon_pause_score_E_site/Total_counts_ORFs)
   
   # Merge occupancy data frames with usage data frame
   Merged_normalised_codon_pause_score_and_usage <- merge(Codon_pause_score_df, Codon_usage_table, by = "Codon", all = TRUE) %>% select(-2,-3,-4)
   
   # Generate the output file path for the codon occupancy output
-  output_codon_occupancy <- file.path(output_folder, paste0(file_path_sans_ext(basename(input_file)), "_cutoff_", filter_threshold, "_pause_score_usage_output.csv"))
+  output_codon_pause_score <- file.path(output_folder, paste0(file_path_sans_ext(basename(input_file)), "_cutoff_", filter_threshold, "_pause_score_usage_output.csv"))
   
   # Write the filtered data to the output file
-  write.csv(Merged_normalised_codon_pause_score_and_usage, file = output_codon_occupancy, row.names = FALSE)
+  write.csv(Merged_normalised_codon_pause_score_and_usage, file = output_codon_pause_score, row.names = FALSE)
   
   # Print a message indicating the completion
   cat("Processed file:", input_file, "\n")
@@ -240,9 +229,9 @@ for (input_file in input_files) {
   cat("Dataset successfully written to the output folder\n")
   
   # Generate the plot
-  codon_occupancy_plot <- ggplot(data = Merged_normalised_codon_pause_score_and_usage,
-                                 mapping = aes(x = Usage, 
-                                               y = Normalised_codon_pause_score_A_site)) +
+  codon_pause_score_plot <- ggplot(data = Merged_normalised_codon_pause_score_and_usage,
+                                   mapping = aes(x = Usage, 
+                                                 y = Normalised_codon_pause_score_A_site)) +
     geom_point(size = 1) +
     geom_smooth(method = "lm", se = FALSE, color = "blue") +
     #stat_cor(label.y = 0.1, label.x = 0.7, method = "pearson") +
@@ -267,15 +256,15 @@ for (input_file in input_files) {
           panel.background = element_rect(linetype = "solid"))
   
   # Generate the output file path for the codon occupancy plot
-  output_file_codon_occupancy_plot <- file.path(output_folder, paste0(file_path_sans_ext(basename(input_file)), "_cutoff_", filter_threshold, "_pause_score_usage_plot.svg"))
+  output_file_codon_pause_score_plot <- file.path(output_folder, paste0(file_path_sans_ext(basename(input_file)), "_cutoff_", filter_threshold, "_pause_score_usage_plot.svg"))
   
   # Set the desired width and height for the SVG plot
   plot_width <- 3.75  # Specify the width in pixels
   plot_height <- 3.33  # Specify the height in pixels
   
   # Export the plot as an SVG image with the specified size
-  svg(output_file_codon_occupancy_plot, width = plot_width, height = plot_height)
-  print(codon_occupancy_plot)
+  svg(output_file_codon_pause_score_plot, width = plot_width, height = plot_height)
+  print(codon_pause_score_plot)
   dev.off()
   
 }
