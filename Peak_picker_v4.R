@@ -71,7 +71,7 @@ for (input_file in input_files) {
   # Perform the desired actions on the data
   ## Filter non-coding RNA out
   alt_predict_input <- filter(alt_predict_input, !grepl("^BSU_", locus_tag))
-  # alt_predict_input <- filter(alt_predict_input, !grepl("^trn_", gene), gene != 'ssrA') #change the code to this if the file does not have locus tags
+  #alt_predict_input <- filter(alt_predict_input, is.na(gene) | !grepl("-", gene) & gene != 'ssrA' & gene != "scr" & gene != "rnpB") #change the code to this if the file does not have locus tags
   ## Filter for highest peaks per gene
   filtered_alt_predict <- alt_predict_input %>%
     group_by(gene) %>%
